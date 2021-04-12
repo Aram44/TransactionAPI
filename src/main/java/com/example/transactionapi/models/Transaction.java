@@ -1,50 +1,62 @@
 package com.example.transactionapi.models;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Table;
 import java.time.LocalDateTime;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity
+@Table(name = "transaction")
 public class Transaction {
+    @javax.persistence.Id
     @Id
-    private String id;
-    private String senderUserId, recevierUserId;
+    @GeneratedValue(strategy= GenerationType.AUTO)
+    private Integer id;
+    private Integer sender;
+    private Integer receiver;
+    private int balance;
     private int status;
-    private int price;
-    private LocalDateTime sendTime;
+    private LocalDateTime sendtime;
 
-    public Transaction(String senderUserId, String recevierUserId, int price) {
-        this.senderUserId = senderUserId;
-        this.recevierUserId = recevierUserId;
-        this.status = 0;
-        this.price = price;
-        this.sendTime = LocalDateTime.now();
-    }
-
-    public Transaction() {
-    }
-
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public String getSenderUserId() {
-        return senderUserId;
+    public Integer getSender() {
+        return sender;
     }
 
-    public void setSenderUserId(String senderUserId) {
-        this.senderUserId = senderUserId;
+    public void setSender(Integer sender) {
+        this.sender = sender;
     }
 
-    public String getRecevierUserId() {
-        return recevierUserId;
+    public Integer getReceiver() {
+        return receiver;
     }
 
-    public void setRecevierUserId(String recevierUserId) {
-        this.recevierUserId = recevierUserId;
+    public void setReceiver(Integer receiver) {
+        this.receiver = receiver;
+    }
+
+    public int getBalance() {
+        return balance;
+    }
+
+    public void setBalance(int balance) {
+        this.balance = balance;
     }
 
     public int getStatus() {
@@ -55,19 +67,11 @@ public class Transaction {
         this.status = status;
     }
 
-    public LocalDateTime getSendTime() {
-        return sendTime;
+    public LocalDateTime getSendtime() {
+        return sendtime;
     }
 
-    public void setSendTime(LocalDateTime sendTime) {
-        this.sendTime = sendTime;
-    }
-
-    public int getPrice() {
-        return price;
-    }
-
-    public void setPrice(int price) {
-        this.price = price;
+    public void setSendtime(LocalDateTime sendtime) {
+        this.sendtime = sendtime;
     }
 }

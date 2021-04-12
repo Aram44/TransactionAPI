@@ -1,58 +1,37 @@
 package com.example.transactionapi.models;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Table;
 
-
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity
+@Table(name = "USER")
 public class User {
+    @javax.persistence.Id
     @Id
-    private String id;
-
-    @NotEmpty(message = "Name is empty")
-    private String name;
-    private int money;
-    @NotEmpty(message = "Name is empty")
-    @Indexed(unique=true)
-    @Email(message = "Not correct Emeil")
+    @GeneratedValue(strategy= GenerationType.AUTO)
+    private Integer id;
     private String email;
     private String password;
+    private String name;
     private String role;
 
-    public User(){ }
 
-    public User(String name, String email, int money, String password){
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.role = "USER";
-        this.money = money;
-    }
-
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getMoney() {
-        return money;
-    }
-
-    public void setMoney(int money) {
-        this.money = money;
     }
 
     public String getEmail() {
@@ -69,6 +48,14 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getRole() {

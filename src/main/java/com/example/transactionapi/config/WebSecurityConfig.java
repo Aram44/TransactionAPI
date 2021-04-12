@@ -43,10 +43,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
+                .antMatchers("/").authenticated()
+                .antMatchers("/changepass").authenticated()
                 .antMatchers("/users").authenticated()
                 .antMatchers("/register").authenticated()
-                .antMatchers("/").authenticated()
+                .antMatchers("/account/**").authenticated()
                 .antMatchers("/add").authenticated()
+                .antMatchers("/add/**").authenticated()
                 .antMatchers("/addtransaction").authenticated()
                 .antMatchers("/view/**").authenticated()
                 .anyRequest().permitAll()

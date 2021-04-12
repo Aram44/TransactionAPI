@@ -6,7 +6,12 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-<header th:insert="blocks/header :: header"></header>
+<div th:if="${role!='USER'}">
+    <header  th:include="blocks/header :: header"></header>
+</div>
+<div th:unless="${role!='USER'}">
+    <header th:include="blocks/header-user :: header"></header>
+</div>
 <div class="container mt-5 text-center">
     <h1>Update Transaction</h1>
     <form th:action="@{/view/{id}/update(id=${id})}" th:object="${transaction}"

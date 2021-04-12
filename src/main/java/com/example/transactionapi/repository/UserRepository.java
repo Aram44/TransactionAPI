@@ -2,9 +2,15 @@ package com.example.transactionapi.repository;
 
 
 import com.example.transactionapi.models.User;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface UserRepository extends MongoRepository<User, String> {
+import java.util.List;
 
-    User findByEmail(String email);
+@Repository
+public interface UserRepository extends JpaRepository<User, Integer> {
+    User findByEmail(String username);
+    List<User> findByEmailNotContaining(String email);
+
+    List<User> findByRoleAndEmailNotContaining(String role, String username);
 }
