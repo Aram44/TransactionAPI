@@ -25,13 +25,18 @@
             <thead class="thead-dark">
             <tr>
                 <th>Name</th>
-                <th>Action</th>
+                <th th:text="${role=='ADMIN'} ? 'Role':'Action'">Action</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="user: ${listUsers}">
                 <td th:text="${user.name}+'('+${user.email}+')'">Name</td>
-                <td><a th:href="@{/add/{id}(id=${user.id})}">Send</a></td>
+                <td th:if="${role=='ADMIN'}">
+                    <span th:text="${user.role}"></span>
+                </td>
+                <td th:unless="${role=='ADMIN'}">
+                    <a th:href="@{/add/{id}(id=${user.id})}">Send</a>
+                </td>
             </tr>
             </tbody>
         </table>

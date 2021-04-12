@@ -27,22 +27,25 @@ public class MainController {
     @Autowired
     private AccountRepository accountRepository;
 
+    private String errorMessage = "";
+
     @GetMapping("/")
     public String home(Model model,Authentication authentication){
         UserDetails userPrincipal = (UserDetails)authentication.getPrincipal();
         User user = userRepository.findByEmail(userPrincipal.getUsername());
+        List<Transaction> listTransaction = new ArrayList<>();
         if(user.getRole().equals("NONE")){
             model.addAttribute("user", user);
             return "change-pass";
         }else if(user.getRole().equals("USER")){
-
-        }
-        List<Transaction> listTransaction = new ArrayList<>();
-        List<Account> accountList = accountRepository.findAllByUid(user.getId());
-        for (Account accountItem: accountList) {
-            System.out.println(accountItem.getId());
-            List<Transaction> list = repository.findAllBySenderOrReceiver(accountItem.getId(),accountItem.getId());
-            listTransaction.addAll(list);
+            List<Account> accountList = accountRepository.findAllByUid(user.getId());
+            for (Account accountItem: accountList) {
+                System.out.println(accountItem.getId());
+                List<Transaction> list = repository.findAllBySenderOrReceiver(accountItem.getId(),accountItem.getId());
+                listTransaction.addAll(list);
+            }
+        }else{
+            listTransaction = repository.findAll();
         }
         model.addAttribute("role",user.getRole());
         model.addAttribute("uid",user.getId());
@@ -97,43 +100,46 @@ public class MainController {
         repository.save(transaction);
         return "redirect:/";
     }
-    @GetMapping("/view/remove/{id}")
-    public String RemoveTransaction(@PathVariable(value = "id") Integer id, Model model){
+    @PostMapping("/view/{action}/{id}")
+    public String RemoveTransaction(@PathVariable(value = "action") String action,@PathVariable(value = "id") Integer id, Model model){
         Transaction transaction = repository.findById(id).orElseThrow();
-        repository.delete(transaction);
-        return "redirect:/";
-    }
-    @GetMapping("/view/apply/{id}")
-    public String ApplyTransaction(@PathVariable(value = "id") Integer id, Model model){
-        Transaction transaction = repository.findById(id).orElseThrow();
-        return "redirect:/";
-    }
-    @GetMapping("/view/refuse/{id}")
-    public String RefuseTransaction(@PathVariable(value = "id") Integer id, Model model){
-        Transaction transaction = repository.findById(id).orElseThrow();
-        transaction.setStatus(3);
+        int status = 0;
+        if(action.equals("apply")){
+            status = 1;
+        }else if(action.equals("refuse")){
+            status = 2;
+        }else if(action.equals("cancel")){
+            status = 3;
+        }else {
+            status = 4;
+        }
+        transaction.setStatus(status);
         repository.save(transaction);
         return "redirect:/";
     }
 
-    private String Deposit(Integer fromID, Integer toID, int balance){
+    private Integer Deposit(Integer fromID, Integer toID, int balance){
         Optional<User> senderOptional = userRepository.findById(fromID);
         User sender = senderOptional.get();
         Optional<User> reciverOptional = userRepository.findById(toID);
         User reciver = reciverOptional.get();
         if(sender==null || reciver == null){
-                return "Transaction success";
+                return 1;
         }
-        return "Transaction faild";
+        return 0;
     }
-    private String WithDrowal(Integer fromID, Integer toID, int price){
+    private Integer WithDrowal(Integer fromID, Integer toID, int price){
         Optional<User> senderOptional = userRepository.findById(fromID);
         User sender = senderOptional.get();
         Optional<User> reciverOptional = userRepository.findById(toID);
         User reciver = reciverOptional.get();
         if(sender==null || reciver == null){
-                return "Transaction success";
+                return 1;
         }
-        return "Transaction faild";
+        return 0;
+    }
+
+    private Integer Internal(){
+        return 0;
     }
 }

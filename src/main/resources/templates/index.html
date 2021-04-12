@@ -26,15 +26,27 @@
         <tbody>
         <tr th:each="item: ${listTransaction}">
             <td th:text="${item.balance}">Price</td>
-            <td th:text="${item.status}">Status</td>
+            <td th:switch="${item.status}">
+                <p th:case="1">Done</p>
+                <p th:case="2">Refused</p>
+                <p th:case="3">Canceled</p>
+                <p th:case="*">In Process</p>
+            </td>
             <td th:text="${item.sendtime}">Time</td>
             <td th:if="${role=='ADMIN'}">
-                <a th:href="@{/view/{id}(id=${item.id})}">Edit</a>
-                <a th:href="@{/view/remove/{id}(id=${item.id})}">Remove</a>
+                <a th:href="@{/view/{id}(id=${item.id})}" class="btn btn-outline-primary">View</a>
+                <form th:if="${item.status==0}" th:action="@{/view/apply/{id}(id=${item.id})}" method="post" style="display: inline">
+                    <button type="submit" class="btn btn-outline-primary">Apply</button>
+                </form>
+                <form th:if="${item.status==0}" th:action="@{/view/refuse/{id}(id=${item.id})}" method="post" style="display: inline">
+                    <button type="submit" class="btn btn-outline-primary">Refuse</button>
+                </form>
             </td>
             <td th:unless="${role=='ADMIN'}">
-                <a th:href="@{/view/{id}(id=${item.id})}">View</a>
-                <a th:href="@{/view/remove/{id}(id=${item.id})}">Cancel</a>
+                <a th:href="@{/view/{id}(id=${item.id})}" class="btn btn-outline-primary">View</a>
+                <form th:if="${item.status==0}" th:action="@{/view/cancel/{id}(id=${item.id})}" method="post" style="display: inline">
+                    <button type="submit" class="btn btn-outline-primary">Cancel</button>
+                </form>
             </td>
         </tr>
         </tbody>
