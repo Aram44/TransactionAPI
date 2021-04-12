@@ -20,7 +20,7 @@ public class Internal {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Integer id;
-    private Integer aid;
+    private Integer tid;
     private Integer balance;
     private Integer status;
 
@@ -32,12 +32,12 @@ public class Internal {
         this.id = id;
     }
 
-    public Integer getAid() {
-        return aid;
+    public Integer getTid() {
+        return tid;
     }
 
-    public void setAid(Integer aid) {
-        this.aid = aid;
+    public void setTid(Integer tid) {
+        this.tid = tid;
     }
 
     public Integer getBalance() {
