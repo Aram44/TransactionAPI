@@ -37,6 +37,12 @@ public class MainController {
 
     @RequestMapping("/")
     public String viewHomePage(Model model,Authentication authentication) {
+        UserDetails userPrincipal = (UserDetails)authentication.getPrincipal();
+        User user = userRepository.findByEmail(userPrincipal.getUsername());
+        if(user.getRole().equals("NONE")){
+            model.addAttribute("user", user);
+            return "change-pass";
+        }
         return home(model, 1,authentication);
     }
     @GetMapping(value = "/page/{page}")
@@ -89,10 +95,12 @@ public class MainController {
         return "add";
     }
     @GetMapping("/view/{id}")
-    public String show(@PathVariable("id") Integer id, Model model){
+    public String show(@PathVariable("id") Integer id, Model model,Authentication authentication){
         if (!repository.existsById(id)){
             return "redirect:/";
         }
+        UserDetails userPrincipal = (UserDetails)authentication.getPrincipal();
+        User user = userRepository.findByEmail(userPrincipal.getUsername());
         Transaction transaction = repository.findById(id).get();
         Account senderAccount = accountRepository.findById(transaction.getSender()).get();
         Account receiverAccount = accountRepository.findById(transaction.getReceiver()).get();
@@ -107,6 +115,7 @@ public class MainController {
         model.addAttribute("receiverList", receiverList);
         model.addAttribute("senderName", sender.getName());
         model.addAttribute("receiverName", receiver.getName());
+        model.addAttribute("role",user.getRole());
         return "view";
     }
 
@@ -168,7 +177,6 @@ public class MainController {
                 }else{
                     receiver = transaction.getSender();
                 }
-
                 Account account = accountRepository.findById(receiver).get();
                 balane = account.getBalance() + balane;
                 account.setBalance(balane);

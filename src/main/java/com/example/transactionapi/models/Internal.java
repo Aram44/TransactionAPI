@@ -18,7 +18,7 @@ import javax.persistence.Table;
 public class Internal {
     @javax.persistence.Id
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Integer id;
     private Integer tid;
     private Integer balance;

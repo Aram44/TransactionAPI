@@ -1,7 +1,6 @@
 package com.example.transactionapi.controllers;
 
 import com.example.transactionapi.models.Account;
-import com.example.transactionapi.models.Transaction;
 import com.example.transactionapi.models.User;
 import com.example.transactionapi.repository.AccountRepository;
 import com.example.transactionapi.repository.UserRepository;
@@ -10,7 +9,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -50,7 +48,8 @@ public class AccountController {
         User user = userRepository.findByEmail(userPrincipal.getUsername());
         Account account = repository.findById(id).get();
         if (account.getUid().equals(user.getId())){
-            repository.delete(account);
+            account.setUid(0);
+            repository.save(account);
         }
         return "redirect:/account";
     }

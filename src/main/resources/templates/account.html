@@ -9,10 +9,10 @@
 <header th:insert="blocks/header-user :: header"></header>
 <div class="container text-center">
     <div>
-        <h1>List of Users</h1>
+        <h1>List of Accounts</h1>
     </div>
-    <form th:action="@{/account/add}" method="post" style="max-width: 600px; margin: 0 auto;">
-        <div>
+    <form th:action="@{/account/add}" method="post" style="margin: 0 auto;">
+        <div style="align-items: flex-start; display: flex;margin-bottom: 10px;">
             <button type="submit" class="btn btn-primary">Add Account</button>
         </div>
     </form>

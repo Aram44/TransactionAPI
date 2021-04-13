@@ -21,7 +21,7 @@
         <div th:text="${errorMessage}" class="alert alert-danger" role="alert"></div>
     </div>
     <div>
-        <div th:if="${role=='ADMIN'}">
+        <div th:if="${role=='ADMIN'}" style="align-items: flex-start; display: flex;margin-bottom: 10px;">
             <a class="btn btn-outline-primary" href="/register">Add User</a>
         </div>
         <table class="table table-striped table-bordered">

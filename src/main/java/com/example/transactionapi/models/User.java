@@ -17,7 +17,7 @@ import javax.validation.constraints.Size;
 public class User {
     @javax.persistence.Id
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Integer id;
     @Column(unique = true)
     @Email

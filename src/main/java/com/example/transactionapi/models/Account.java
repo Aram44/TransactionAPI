@@ -18,7 +18,7 @@ import javax.persistence.Table;
 public class Account {
     @javax.persistence.Id
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Integer id;
     private Integer uid;
     private Integer balance;
