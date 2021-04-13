@@ -19,7 +19,7 @@
         <span th:text="'Sender name: '+${senderName}"></span><br>
         <span th:text="'Receiver name: '+${receiverName}"></span>
     </div>
-    <form th:action="@{/view/update/{id}(id=${id})}" th:object="${transaction}"
+    <form th:action="@{/view/update}" th:object="${transaction}"
           method="post" style="max-width: 600px; margin: 0 auto;">
         <div class="m-3">
             <div class="form-group row">

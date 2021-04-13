@@ -64,6 +64,8 @@ public class MainController {
         model.addAttribute("role",user.getRole());
         model.addAttribute("uid",user.getId());
         model.addAttribute("listTransaction", listTransaction);
+        model.addAttribute("message",this.message);
+        this.message = "";
         return "index";
     }
 
@@ -89,24 +91,6 @@ public class MainController {
         return "view";
     }
 
-    @GetMapping("/add/{id}")
-    public String TransactionAdd(@PathVariable(value = "id") Integer id,Model model,Authentication authentication){
-        if(id<0){
-            return "redirect:/";
-        }
-        UserDetails userPrincipal = (UserDetails)authentication.getPrincipal();
-        User user = userRepository.findByEmail(userPrincipal.getUsername());
-        List<Account> accountListReceiver = accountRepository.findAllByUid(id);
-        List<Account> accountList = accountRepository.findAllByUid(user.getId());
-        Transaction transaction = new Transaction();
-        transaction.setReceiver(id);
-        transaction.setSender(user.getId());
-        model.addAttribute("transaction", transaction);
-        model.addAttribute("accoutList", accountList);
-        model.addAttribute("accoutListReceiver", accountListReceiver);
-        return "add";
-    }
-
     @PostMapping("/transaction/add")
     public String NewTransaction(Transaction transaction){
         transaction.setSendtime(LocalDateTime.now());
@@ -119,9 +103,8 @@ public class MainController {
         }
         return "redirect:/";
     }
-    @PostMapping("/view/update/{id}")
-    public String UpdateTransaction(@PathVariable(value = "id") Integer id, Transaction transaction,Model model){
-        transaction.setId(id);
+    @PostMapping("/view/update")
+    public String UpdateTransaction(Transaction transaction,Model model){
         repository.save(transaction);
         return "redirect:/";
     }
