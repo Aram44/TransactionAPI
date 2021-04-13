@@ -5,22 +5,24 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Table;
+import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Size;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "USER")
+@Table(name = "USER", uniqueConstraints = @UniqueConstraint(name = "email",columnNames = ("email")))
 public class User {
     @javax.persistence.Id
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Integer id;
+    @Column(unique = true)
+    @Email
     private String email;
+    @Size(min = 8, max = 20, message = "Password should be between 2 to 20")
     private String password;
     private String name;
     private String role;

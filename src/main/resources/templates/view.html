@@ -14,25 +14,34 @@
 </div>
 <div class="container mt-5 text-center">
     <h1>Update Transaction</h1>
-    <form th:action="@{/view/{id}/update(id=${id})}" th:object="${transaction}"
+
+    <div class="col-8">
+        <span th:text="'Sender name: '+${senderName}"></span><br>
+        <span th:text="'Receiver name: '+${receiverName}"></span>
+    </div>
+    <form th:action="@{/update}" th:object="${transaction}"
           method="post" style="max-width: 600px; margin: 0 auto;">
         <div class="m-3">
             <div class="form-group row">
                 <label class="col-4 col-form-label">User ID: </label>
                 <div class="col-8">
-                    <input type="text" th:field="*{senderUserId}" class="form-control" required />
+                    <select th:field="*{sender}" th:each="senderItem : ${senderList}" class="w-100 form-select form-select-lg mb-3" aria-label=".form-select-lg example">
+                        <option th:value="${senderItem.id}" th:text="${senderItem.id}"></option>
+                    </select>
                 </div>
             </div>
             <div class="form-group row">
                 <label class="col-4 col-form-label">Send to: </label>
                 <div class="col-8">
-                    <input type="text" th:field="*{recevierUserId}" class="form-control" required/>
+                    <select th:field="*{receiver}" th:each="recevierItem : ${receiverList}" class="w-100 form-select form-select-lg mb-3" aria-label=".form-select-lg example">
+                        <option th:value="${recevierItem.id}" th:text="${recevierItem.id}"></option>
+                    </select>
                 </div>
             </div>
             <div class="form-group row">
                 <label class="col-4 col-form-label">Price: </label>
                 <div class="col-8">
-                    <input type="number" th:field="*{price}" class="form-control" required/>
+                    <input type="number" th:field="*{balance}" class="form-control" required/>
                 </div>
             </div>
             <div>

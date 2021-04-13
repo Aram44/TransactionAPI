@@ -1,18 +1,28 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Blog</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Login</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-<div class="container mt-5">
-    <h1>Login</h1>
-    <form action="/login" method="post">
-        <input type="text" name="email" placeholder="Email" class="form-control mt-2">
-        <input type="text" name="password" placeholder="Password" class="form-control mt-2">
-        <button type="submit" class="btn btn-success mt-2">Login</button>
-    </form>
+<div class="container text-center">
+    <h1>Login page</h1>
+    <div class="row justify-content-center">
+    <div style="width: 300px">
+        <div th:if="${loginError}" class="alert alert-danger">Wrong Email or Password</div>
+        <form th:action="@{/login}" method="post">
+            <div class="form-group">
+                <label for="username">Email address</label>
+                <input type="email" class="form-control" id="username" name="username" autofocus="autofocus" aria-describedby="emailHelp" placeholder="Enter email">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-control" placeholder="Password">
+            </div>
+            <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+    </div>
+    </div>
 </div>
 </body>
 </html>
