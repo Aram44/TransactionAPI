@@ -14,8 +14,12 @@
     <header th:include="blocks/header-user :: header"></header>
 </div>
 <div class="container text-center">
-    <div>
-        <h1>List of Users</h1>
+    <div><h1>List of Users</h1></div>
+    <div th:if="${message!=''}">
+        <div th:text="${message}" class="alert alert-success" role="alert"></div>
+    </div>
+    <div th:if="${errorMessage!=''}">
+        <div th:text="${errorMessage}" class="alert alert-danger" role="alert"></div>
     </div>
     <div>
         <div th:if="${role=='ADMIN'}">

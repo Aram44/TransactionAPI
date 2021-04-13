@@ -14,7 +14,10 @@
 </div>
 <div class="container text-center">
     <div th:if="${message!=''}">
-        <div th:text="${message}"  class="alert alert-danger" role="alert"></div>
+        <div th:text="${message}" class="alert alert-success" role="alert"></div>
+    </div>
+    <div th:if="${errorMessage!=''}">
+        <div th:text="${errorMessage}" class="alert alert-danger" role="alert"></div>
     </div>
 <div>
     <table class="table table-striped table-bordered">

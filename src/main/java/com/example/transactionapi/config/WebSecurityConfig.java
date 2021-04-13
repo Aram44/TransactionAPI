@@ -47,6 +47,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/page/**").authenticated()
                 .antMatchers("/changepass").authenticated()
                 .antMatchers("/users").authenticated()
+                .antMatchers("/update").authenticated()
                 .antMatchers("/register").authenticated()
                 .antMatchers("/account/**").authenticated()
                 .antMatchers("/add").authenticated()

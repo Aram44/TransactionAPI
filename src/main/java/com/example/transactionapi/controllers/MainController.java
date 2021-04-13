@@ -33,6 +33,8 @@ public class MainController {
     private InternalRepository internalRepository;
 
     private String message = "";
+    private String errorMessage = "";
+
     @RequestMapping("/")
     public String viewHomePage(Model model,Authentication authentication) {
         return home(model, 1,authentication);
@@ -53,7 +55,6 @@ public class MainController {
             }
         }else{
             Pageable pageable = PageRequest.of(page-1, 5);
-
             Page<Transaction> pages = repository.findAll(pageable);
             listTransaction = pages.getContent();
 
@@ -65,10 +66,28 @@ public class MainController {
         model.addAttribute("uid",user.getId());
         model.addAttribute("listTransaction", listTransaction);
         model.addAttribute("message",this.message);
+        model.addAttribute("errorMessage",this.errorMessage);
         this.message = "";
+        this.errorMessage = "";
         return "index";
     }
-
+    @GetMapping("/add/{id}")
+    public String TransactionAdd(@PathVariable(value = "id") Integer id,Model model,Authentication authentication){
+        if(id<0){
+            return "redirect:/";
+        }
+        UserDetails userPrincipal = (UserDetails)authentication.getPrincipal();
+        User user = userRepository.findByEmail(userPrincipal.getUsername());
+        List<Account> accountListReceiver = accountRepository.findAllByUid(id);
+        List<Account> accountList = accountRepository.findAllByUid(user.getId());
+        Transaction transaction = new Transaction();
+        transaction.setReceiver(id);
+        transaction.setSender(user.getId());
+        model.addAttribute("transaction", transaction);
+        model.addAttribute("accoutList", accountList);
+        model.addAttribute("accoutListReceiver", accountListReceiver);
+        return "add";
+    }
     @GetMapping("/view/{id}")
     public String show(@PathVariable("id") Integer id, Model model){
         if (!repository.existsById(id)){
@@ -103,28 +122,29 @@ public class MainController {
         }
         return "redirect:/";
     }
-    @PostMapping("/view/update")
+    @PostMapping("/update")
     public String UpdateTransaction(Transaction transaction,Model model){
         repository.save(transaction);
         return "redirect:/";
     }
     @PostMapping("/view/{action}/{id}")
-    public String RemoveTransaction(@PathVariable(value = "action") String action,@PathVariable(value = "id") Integer id, Model model){
+    public String ActionTransaction(@PathVariable(value = "action") String action,@PathVariable(value = "id") Integer id, Model model){
         try {
             Transaction transaction = repository.findById(id).orElseThrow();
             int status = 0;
             if(action.equals("apply")){
+                System.out.println(transaction.getId());
                 if (DepositWithdrawal(transaction.getId(), true)){
                     this.message = "Transaction success!";
                 }
                 status = 1;
             }else if(action.equals("refuse")){
                 if (DepositWithdrawal(transaction.getId(), false)){
-                    this.message = "Transaction Refused by Admin!";
+                    this.errorMessage = "Transaction Refused by Admin!";
                 }
                 status = 2;
             }else if(action.equals("cancel")){
-                this.message = "Transaction Canceled";
+                this.errorMessage = "Transaction Canceled";
                 status = 3;
             }else {
                 status = 4;
@@ -132,7 +152,7 @@ public class MainController {
             transaction.setStatus(status);
             repository.save(transaction);
         }catch (Exception e){
-            this.message = e.getMessage();
+            this.errorMessage = e.getMessage();
         }
         return "redirect:/";
     }
@@ -154,15 +174,14 @@ public class MainController {
                 account.setBalance(balane);
                 accountRepository.save(account);
 
-                Internal internal = (Internal) internalRepository.findByTid(tid);
+                Internal internal = internalRepository.findByTid(tid);
                 internal.setStatus(1);
                 internalRepository.save(internal);
                 return  true;
             }
         }catch (Exception e){
-            this.message = e.getMessage();
+            this.errorMessage = e.getMessage();
         }
-
         return false;
     }
 
@@ -180,12 +199,10 @@ public class MainController {
             account.setBalance(balanceSave);
 
             accountRepository.save(account);
-            System.out.println(internalRepository);
             internalRepository.save(internal);
             return true;
         }catch (Exception e){
-            this.message = e.getMessage();
-            System.out.println(e.getMessage());
+            this.errorMessage = e.getMessage();
         }
         return false;
     }

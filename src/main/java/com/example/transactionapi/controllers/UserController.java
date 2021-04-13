@@ -16,6 +16,10 @@ import java.util.List;
 public class UserController {
     @Autowired
     private UserRepository repository;
+
+    private String message = "";
+    private String errorMessage = "";
+
     @GetMapping("/register")
     public String registerPage(Model model){
         model.addAttribute("user", new User());
@@ -31,11 +35,13 @@ public class UserController {
                 user.setPassword(encodedPassword);
                 user.setRole("NONE");
                 repository.save(user);
+                this.message = "User created";
+            }else{
+                this.errorMessage = "Such user already exists!";
             }
         }catch (Exception e){
-            e.getMessage();
+            this.message = e.getMessage();
         }
-
         return "redirect:/users";
     }
     @PostMapping("/changepass")
@@ -61,6 +67,10 @@ public class UserController {
 
         model.addAttribute("role",user.getRole());
         model.addAttribute("listUsers", listUsers);
+        model.addAttribute("message",this.message);
+        model.addAttribute("errorMessage",this.errorMessage);
+        this.message = "";
+        this.errorMessage = "";
         return "users";
     }
 }
