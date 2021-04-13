@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Size;
 
 @Data
 @AllArgsConstructor
@@ -18,7 +20,9 @@ public class User {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Integer id;
     @Column(unique = true)
+    @Email
     private String email;
+    @Size(min = 8, max = 20, message = "Password should be between 2 to 20")
     private String password;
     private String name;
     private String role;
