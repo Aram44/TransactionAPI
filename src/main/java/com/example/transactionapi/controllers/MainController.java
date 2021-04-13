@@ -9,6 +9,9 @@ import com.example.transactionapi.repository.InternalRepository;
 import com.example.transactionapi.repository.TransactionRepository;
 import com.example.transactionapi.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -16,9 +19,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Controller
 public class MainController {
@@ -32,9 +33,12 @@ public class MainController {
     private InternalRepository internalRepository;
 
     private String message = "";
-
-    @GetMapping("/")
-    public String home(Model model,Authentication authentication){
+    @RequestMapping("/")
+    public String viewHomePage(Model model,Authentication authentication) {
+        return home(model, 1,authentication);
+    }
+    @GetMapping(value = "/page/{page}")
+    public String home(Model model,@PathVariable("page") int page,Authentication authentication){
         UserDetails userPrincipal = (UserDetails)authentication.getPrincipal();
         User user = userRepository.findByEmail(userPrincipal.getUsername());
         List<Transaction> listTransaction = new ArrayList<>();
@@ -48,7 +52,14 @@ public class MainController {
                 listTransaction.addAll(list);
             }
         }else{
-            listTransaction = repository.findAll();
+            Pageable pageable = PageRequest.of(page-1, 5);
+
+            Page<Transaction> pages = repository.findAll(pageable);
+            listTransaction = pages.getContent();
+
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", pages.getTotalPages());
+            model.addAttribute("totalItems", pages.getTotalElements());
         }
         model.addAttribute("role",user.getRole());
         model.addAttribute("uid",user.getId());
@@ -61,9 +72,20 @@ public class MainController {
         if (!repository.existsById(id)){
             return "redirect:/";
         }
-        Optional<Transaction> transaction = repository.findById(id);
-        Transaction result = transaction.get();
-        model.addAttribute("transaction", result);
+        Transaction transaction = repository.findById(id).get();
+        Account senderAccount = accountRepository.findById(transaction.getSender()).get();
+        Account receiverAccount = accountRepository.findById(transaction.getReceiver()).get();
+        User sender = userRepository.findById(senderAccount.getUid()).get();
+        User receiver = userRepository.findById(receiverAccount.getUid()).get();
+
+        List<Account> senderList = accountRepository.findAllByUid(sender.getId());
+        List<Account> receiverList = accountRepository.findAllByUid(receiver.getId());
+
+        model.addAttribute("transaction", transaction);
+        model.addAttribute("senderList", senderList);
+        model.addAttribute("receiverList", receiverList);
+        model.addAttribute("senderName", sender.getName());
+        model.addAttribute("receiverName", receiver.getName());
         return "view";
     }
 

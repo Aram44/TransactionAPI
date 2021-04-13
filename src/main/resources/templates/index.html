@@ -51,6 +51,11 @@
         </tr>
         </tbody>
     </table>
+    <span th:each="i: ${#numbers.sequence(1, totalPages)}">
+        <a class="btn btn-outline-primary" th:if="${currentPage != i}" th:href="@{'/page/' + ${i}}">[[${i}]]</a>
+        <span class="btn btn-primary" th:unless="${currentPage != i}">[[${i}]]</span>
+        &nbsp;
+    </span>
 </div>
 </div>
 </body>
