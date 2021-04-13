@@ -175,6 +175,7 @@ public class MainController {
             account.setBalance(balanceSave);
 
             accountRepository.save(account);
+            System.out.println(internalRepository);
             internalRepository.save(internal);
             return true;
         }catch (Exception e){

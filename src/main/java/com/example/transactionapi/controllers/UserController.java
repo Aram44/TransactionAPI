@@ -23,11 +23,19 @@ public class UserController {
     }
     @PostMapping("/register")
     public String processRegister(User user) {
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        String encodedPassword = passwordEncoder.encode(user.getPassword());
-        user.setPassword(encodedPassword);
-        user.setRole("NONE");
-        repository.save(user);
+        try {
+            User uid = repository.findByEmail(user.getEmail());
+            if (uid==null){
+                BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+                String encodedPassword = passwordEncoder.encode(user.getPassword());
+                user.setPassword(encodedPassword);
+                user.setRole("NONE");
+                repository.save(user);
+            }
+        }catch (Exception e){
+            e.getMessage();
+        }
+
         return "redirect:/users";
     }
     @PostMapping("/changepass")
