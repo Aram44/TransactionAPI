@@ -1,6 +1,7 @@
 package com.example.transactionapi.controllers.implementation;
 
 import com.example.transactionapi.config.JwtTokenProvider;
+import com.example.transactionapi.models.AuthRequest;
 import com.example.transactionapi.models.User;
 import com.example.transactionapi.repository.UserRepository;
 import org.slf4j.Logger;
@@ -14,13 +15,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/v1/auth")
+@CrossOrigin(origins = "*")
 public class AuthorizationResource {
 
     private static Logger log = LoggerFactory.getLogger(AuthorizationResource.class);
@@ -34,18 +33,18 @@ public class AuthorizationResource {
     @Autowired
     private UserRepository userRepository;
 
-    @PostMapping(value = "/authenticate", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<String> authenticate(@RequestBody User user) {
-        log.info("UserResourceImpl : authenticate");
+    @PostMapping(value = "/authenticate")
+    public ResponseEntity<String> authenticate(@RequestBody AuthRequest authRequest) {
         JSONObject jsonObject = new JSONObject();
         try {
             Authentication authentication = authenticationManager
-                    .authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
+                    .authenticate(new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword()));
             if (authentication.isAuthenticated()) {
-                String email = user.getEmail();
+                String email = authRequest.getEmail();
                 jsonObject.put("name", authentication.getName());
                 jsonObject.put("authorities", authentication.getAuthorities());
                 jsonObject.put("token", tokenProvider.createToken(email, userRepository.findByEmail(email).getRole()));
+                System.out.println(jsonObject.toString());
                 return new ResponseEntity<String>(jsonObject.toString(), HttpStatus.OK);
             }
         } catch (JSONException e) {
@@ -54,6 +53,7 @@ public class AuthorizationResource {
             } catch (JSONException e1) {
                 e1.printStackTrace();
             }
+            log.info("UserResourceImpl : "+e.getMessage());
             return new ResponseEntity<String>(jsonObject.toString(), HttpStatus.UNAUTHORIZED);
         }
         return null;

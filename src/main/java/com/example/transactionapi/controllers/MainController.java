@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.*;
 
-@CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/api/v1/")
+@RequestMapping("/api/v1")
+@CrossOrigin(origins = "*")
 public class MainController {
     @Autowired
     private TransactionRepository transactionRepository;
