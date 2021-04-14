@@ -1,26 +1,15 @@
 package com.example.transactionapi.controllers;
 
-import com.example.transactionapi.models.Account;
-import com.example.transactionapi.models.Internal;
 import com.example.transactionapi.models.Transaction;
-import com.example.transactionapi.models.User;
 import com.example.transactionapi.repository.AccountRepository;
-import com.example.transactionapi.repository.InternalRepository;
 import com.example.transactionapi.repository.TransactionRepository;
 import com.example.transactionapi.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
 @CrossOrigin(origins = "*")
@@ -33,8 +22,6 @@ public class MainController {
     private UserRepository userRepository;
     @Autowired
     private AccountRepository accountRepository;
-    @Autowired
-    private InternalRepository internalRepository;
 
     private String message = "";
     private String errorMessage = "";

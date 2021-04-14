@@ -2,15 +2,13 @@ package com.example.transactionapi.repository;
 
 
 import com.example.transactionapi.models.User;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @Repository
 public interface UserRepository extends PagingAndSortingRepository<User, Integer> {
-    User findByEmail(String username);
-    List<User> findByEmailNotContaining(String email);
-
-    List<User> findByRoleAndEmailNotContaining(String role, String username);
+    @Query("FROM User WHERE email=:email")
+    User findByEmail(@Param("email") String email);
 }

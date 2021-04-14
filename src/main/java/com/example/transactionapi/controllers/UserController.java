@@ -1,76 +1,45 @@
 package com.example.transactionapi.controllers;
 
 import com.example.transactionapi.models.User;
-import com.example.transactionapi.repository.UserRepository;
+import com.example.transactionapi.services.ShowService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-import java.util.List;
 
-@CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/api/v1/")
-public class UserController {
+@RequestMapping("/api/v1/users")
+@CrossOrigin(origins = "*")
+public class UserController implements Resource<User> {
+
     @Autowired
-    private UserRepository userRepository;
+    private ShowService<User> userService;
 
-    private String message = "";
-    private String errorMessage = "";
-
-    @GetMapping("/login")
-    public String login() {
-        return "login";
+    @Override
+    public ResponseEntity<Page<User>> findAll(Pageable pageable) {
+        return new ResponseEntity<>(userService.findAll(pageable), HttpStatus.OK);
     }
 
-    @GetMapping("/login-error")
-    public String loginError(Model model) {
-        model.addAttribute("loginError", true);
-        return "login";
+    @Override
+    public ResponseEntity<User> findByID(Integer id) {
+        return new ResponseEntity<>(userService.findById(id), HttpStatus.OK);
     }
 
-    @GetMapping("/register")
-    public String registerPage(Model model){
-        model.addAttribute("user", new User());
-        return "add-user";
+    @Override
+    public ResponseEntity<User> save(User user) {
+        return new ResponseEntity<>(userService.saveOrUpdate(user), HttpStatus.CREATED);
     }
-    @PostMapping("/register")
-    public String processRegister(@Valid User user, BindingResult bindingResult) {
-        System.out.println(bindingResult.hasErrors());
-        try {
-            User uid = userRepository.findByEmail(user.getEmail());
-            if (uid==null){
-                BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-                String encodedPassword = passwordEncoder.encode(user.getPassword());
-                user.setPassword(encodedPassword);
-                user.setRole("NONE");
-                userRepository.save(user);
-                this.message = "User created";
-            }else{
-                this.errorMessage = "Such user already exists!";
-            }
-        }catch (Exception e){
-            this.message = e.getMessage();
-        }
-        return "redirect:/users";
+
+    @Override
+    public ResponseEntity<User> update(User user) {
+        return new ResponseEntity<>(userService.saveOrUpdate(user), HttpStatus.OK);
     }
-    @PostMapping("/changepass")
-    public String changepass(User user, Model model){
-        System.out.print(user.getId()+" "+user.getName()+" "+user.getEmail());
-        user.setRole("USER");
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        String encodedPassword = passwordEncoder.encode(user.getPassword());
-        user.setPassword(encodedPassword);
-        userRepository.save(user);
-        return "redirect:/";
-    }
-    
-    @GetMapping("/allusers")
-    public List<User> listUsers() {
-        List<User> listUsers = userRepository.findAll();
-        return listUsers;
+
+    @Override
+    public ResponseEntity<String> deleteById(Integer id) {
+        return new ResponseEntity<>(userService.deleteById(id), HttpStatus.OK);
     }
 }

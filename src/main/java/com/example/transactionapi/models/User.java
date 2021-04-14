@@ -13,7 +13,6 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "USER", uniqueConstraints = @UniqueConstraint(name = "email",columnNames = ("email")))
 public class User {
     @javax.persistence.Id
     @Id
@@ -25,7 +24,9 @@ public class User {
     @Size(min = 8, max = 20, message = "Password should be between 2 to 20")
     private String password;
     private String name;
-    private String role;
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private Role role;
 
 
     public Integer getId() {
@@ -60,11 +61,11 @@ public class User {
         this.name = name;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 }

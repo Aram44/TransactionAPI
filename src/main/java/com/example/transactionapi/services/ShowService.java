@@ -8,7 +8,7 @@ public interface ShowService<T> {
 
     T findById(Integer id);
 
-    T saveorUpdate(T t);
+    T saveOrUpdate(T t);
 
     String deleteById(Integer id);
 }
