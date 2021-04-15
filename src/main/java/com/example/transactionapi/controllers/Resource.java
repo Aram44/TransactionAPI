@@ -6,6 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin(origins = "*")
 public interface Resource<T> {
     @GetMapping
     ResponseEntity<Page<T>> findAll(Pageable pageable);

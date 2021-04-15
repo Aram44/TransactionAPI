@@ -19,6 +19,7 @@ public class UserController implements Resource<User> {
     private ShowService<User> userService;
 
     @Override
+    @GetMapping("/allusers")
     public ResponseEntity<Page<User>> findAll(Pageable pageable) {
         return new ResponseEntity<>(userService.findAll(pageable), HttpStatus.OK);
     }

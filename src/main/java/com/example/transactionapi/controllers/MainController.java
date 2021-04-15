@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.*;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/")
 @CrossOrigin(origins = "*")
 public class MainController {
     @Autowired
@@ -26,6 +26,7 @@ public class MainController {
     private String message = "";
     private String errorMessage = "";
 
+    @CrossOrigin(origins = "*")
     @GetMapping("/alltransactions")
     public List<Transaction> AllTransaction(){
         return transactionRepository.findAll();
