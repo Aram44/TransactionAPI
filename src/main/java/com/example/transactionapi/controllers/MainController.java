@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,5 +76,29 @@ public class MainController{
             e.printStackTrace();
         }
         return new ResponseEntity<>(jsonObject.toString(), HttpStatus.OK);
+    }
+    @GetMapping("/filter")
+    @ResponseBody
+    public ResponseEntity<Page<Transaction>> withFilter(@RequestParam(defaultValue = "none") String start, @RequestParam(defaultValue = "none") String finish, @RequestParam(defaultValue = "none") String uid, Pageable pageable) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        if (start!="none" || finish!="none"){
+            LocalDateTime dateStart = LocalDateTime.parse(start+" 00:00:00", formatter);
+            LocalDateTime dateFinish = LocalDateTime.parse(finish+" 00:00:00", formatter);
+            if(uid=="none"){
+                return new ResponseEntity<>(transactionRepository.findAllBySendtimeBetween(dateStart,dateFinish,pageable), HttpStatus.OK);
+            }else {
+                List<Account> accountList = accountRepository.findAllByUId(Integer.valueOf(uid));
+                List<Transaction> listTransaction = new ArrayList<>();
+                for (Account accountItem : accountList) {
+                    List<Transaction> list = transactionRepository.findAllBySenderOrReceiverAndSendtimeBetween(accountItem.getId(), accountItem.getId(), dateStart, dateFinish);
+                    listTransaction.addAll(list);
+                }
+                Page<Transaction> page = new PageImpl<>(listTransaction);
+                return new ResponseEntity<>(page, HttpStatus.OK);
+            }
+        }
+        LocalDateTime dateStart = LocalDateTime.parse("0000-00-00 00:00:00", formatter);
+        LocalDateTime dateFinish = LocalDateTime.parse("0000-00-00 00:00:00", formatter);
+        return new ResponseEntity<>(transactionRepository.findAllBySendtimeBetween(dateStart,dateFinish,pageable), HttpStatus.OK);
     }
 }

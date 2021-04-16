@@ -21,6 +21,7 @@ public class Transaction {
     private Integer receiver;
     private int balance;
     private Status status;
+    @Convert(converter = LocalDateTimeConverter.class)
     private LocalDateTime sendtime;
     private Type type;
 
