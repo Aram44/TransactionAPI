@@ -2,6 +2,8 @@ package com.example.transactionapi.controllers;
 
 import com.example.transactionapi.models.Account;
 import com.example.transactionapi.repository.AccountRepository;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,14 +26,27 @@ public class AccountController{
 
     @PostMapping("/create")
     public ResponseEntity<String> create(@RequestBody Account account) {
-        accountRepository.save(account);
-        return new ResponseEntity<>("Account Saved", HttpStatus.OK);
+        JSONObject jsonObject = new JSONObject();
+        try {
+            account.setBalance(0);
+            accountRepository.save(account);
+            jsonObject.put("message","Added");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(jsonObject.toString(), HttpStatus.OK);
     }
-    @GetMapping("/account/remove/{id}")
-    public ResponseEntity<String> deleteAccount(@PathVariable("id") Integer id){
-        Account account = accountRepository.findById(id).get();
-        account.setUid(0);
-        accountRepository.save(account);
-        return new ResponseEntity<>("Account Deleted", HttpStatus.OK);
+    @GetMapping("/remove/{id}")
+    public ResponseEntity<String> deleteAccount(@PathVariable Integer id){
+        JSONObject jsonObject = new JSONObject();
+        try {
+            Account account = accountRepository.findById(id).get();
+            account.setUid(0);
+            accountRepository.save(account);
+            jsonObject.put("message","Deleted");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(jsonObject.toString(), HttpStatus.OK);
     }
 }

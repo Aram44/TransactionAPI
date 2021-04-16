@@ -1,10 +1,12 @@
 package com.example.transactionapi.controllers;
 
 import com.example.transactionapi.models.Account;
+import com.example.transactionapi.models.Status;
 import com.example.transactionapi.models.Transaction;
 import com.example.transactionapi.models.Type;
 import com.example.transactionapi.repository.AccountRepository;
 import com.example.transactionapi.repository.TransactionRepository;
+import com.example.transactionapi.services.ActionService;
 import com.example.transactionapi.services.NotificationService;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -31,7 +33,9 @@ public class MainController{
     @Autowired
     private AccountRepository accountRepository;
     @Autowired
-    NotificationService notificationService;
+    private NotificationService notificationService;
+    @Autowired
+    private ActionService actionService;
 
     @GetMapping("/alltransactions")
     public ResponseEntity<Page<Transaction>> findAll(Pageable pageable) {
@@ -41,6 +45,34 @@ public class MainController{
     @GetMapping("/transaction/view/{id}")
     public ResponseEntity<Transaction> findByID(@PathVariable Integer id) {
         return new ResponseEntity<>(transactionRepository.findById(id).get(), HttpStatus.OK);
+    }
+
+    @GetMapping("/transaction/{action}/{id}")
+    public ResponseEntity<String> action(@PathVariable Integer action,@PathVariable Integer id) {
+        JSONObject jsonObject = new JSONObject();
+        Transaction transaction = transactionRepository.findById(id).get();
+            try {
+                if(transaction!=null){
+                    Status status;
+                    if (action==1){
+                        status = Status.DONE;
+                    }else if(action==2){
+                        status = Status.REFUSED;
+                    }else {
+                        status = Status.CANCELED;
+                    }
+//                    actionService.TransactionNotify(id,status);
+                    transaction.setStatus(status);
+                    transactionRepository.save(transaction);
+                    jsonObject.put("message","Added");
+                }else {
+                    jsonObject.put("message","Transaction not found");
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        return new ResponseEntity<>(jsonObject.toString(), HttpStatus.OK);
     }
 
     @GetMapping("/transaction/{uid}")
@@ -57,7 +89,6 @@ public class MainController{
 
     @PostMapping("/transaction")
     public ResponseEntity<Transaction> save(@RequestBody Transaction transaction) {
-        System.out.println(transaction.getStatus());
         transaction.setSendtime(LocalDateTime.now());
         Type type = Type.WITHDRAWAL;
         transaction.setType(type);
