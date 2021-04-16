@@ -24,6 +24,7 @@ public class User {
     @Size(min = 8, max = 20, message = "Password should be between 2 to 20")
     private String password;
     private String name;
+
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;

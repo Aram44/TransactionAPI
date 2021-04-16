@@ -5,10 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Data
@@ -23,8 +20,9 @@ public class Transaction {
     private Integer sender;
     private Integer receiver;
     private int balance;
-    private int status;
+    private Status status;
     private LocalDateTime sendtime;
+    private Type type;
 
     public Integer getId() {
         return id;
@@ -58,11 +56,11 @@ public class Transaction {
         this.balance = balance;
     }
 
-    public int getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 
@@ -72,5 +70,13 @@ public class Transaction {
 
     public void setSendtime(LocalDateTime sendtime) {
         this.sendtime = sendtime;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
     }
 }

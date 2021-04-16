@@ -1,4 +1,4 @@
-package com.example.transactionapi.services.implementation;
+package com.example.transactionapi.services;
 
 import com.example.transactionapi.models.User;
 import com.example.transactionapi.repository.UserRepository;
