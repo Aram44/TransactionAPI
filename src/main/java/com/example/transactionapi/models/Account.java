@@ -20,6 +20,7 @@ public class Account {
     private Integer id;
     private Integer uid;
     private Integer balance;
+    private Integer reserv;
 
     public Integer getId() {
         return id;
@@ -43,5 +44,13 @@ public class Account {
 
     public void setBalance(Integer balance) {
         this.balance = balance;
+    }
+
+    public Integer getReserv() {
+        return reserv;
+    }
+
+    public void setReserv(Integer reserv) {
+        this.reserv = reserv;
     }
 }

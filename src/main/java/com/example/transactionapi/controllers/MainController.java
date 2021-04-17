@@ -3,7 +3,6 @@ package com.example.transactionapi.controllers;
 import com.example.transactionapi.models.Account;
 import com.example.transactionapi.models.Status;
 import com.example.transactionapi.models.Transaction;
-import com.example.transactionapi.models.Type;
 import com.example.transactionapi.repository.AccountRepository;
 import com.example.transactionapi.repository.TransactionRepository;
 import com.example.transactionapi.services.ActionService;
@@ -56,6 +55,7 @@ public class MainController{
                     Status status;
                     if (action==1){
                         status = Status.DONE;
+                        actionService.Transaction(transaction.getId(),Status.DONE);
                     }else if(action==2){
                         status = Status.REFUSED;
                     }else {
@@ -88,12 +88,23 @@ public class MainController{
     }
 
     @PostMapping("/transaction")
-    public ResponseEntity<Transaction> save(@RequestBody Transaction transaction) {
-        transaction.setSendtime(LocalDateTime.now());
-        Type type = Type.WITHDRAWAL;
-        transaction.setType(type);
+    public ResponseEntity<String> save(@RequestBody Transaction transaction) {
+        JSONObject jsonObject = new JSONObject();
+        System.out.println();
+        try {
+            if (actionService.TransactionSave(transaction.getSender(),transaction.getReceiver(),transaction.getBalance(),transaction.getType())){
+                transaction.setSendtime(LocalDateTime.now());
+                transactionRepository.save(transaction);
+                jsonObject.put("message","Transaction Saved");
 //        notificationService.SendNotification(email,"Transaction Added");
-        return new ResponseEntity<>(transactionRepository.save(transaction), HttpStatus.CREATED);
+            }else {
+                jsonObject.put("message","Transaction Error!");
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(jsonObject.toString(), HttpStatus.CREATED);
     }
 
 
@@ -115,7 +126,7 @@ public class MainController{
         if (start!="none" || finish!="none"){
             LocalDateTime dateStart = LocalDateTime.parse(start+" 00:00:00", formatter);
             LocalDateTime dateFinish = LocalDateTime.parse(finish+" 00:00:00", formatter);
-            if(uid=="none"){
+            if(uid.equals("none")){
                 return new ResponseEntity<>(transactionRepository.findAllBySendtimeBetween(dateStart,dateFinish,pageable), HttpStatus.OK);
             }else {
                 List<Account> accountList = accountRepository.findAllByUId(Integer.valueOf(uid));

@@ -29,6 +29,7 @@ public class AccountController{
         JSONObject jsonObject = new JSONObject();
         try {
             account.setBalance(0);
+            account.setReserv(0);
             accountRepository.save(account);
             jsonObject.put("message","Added");
         } catch (JSONException e) {
