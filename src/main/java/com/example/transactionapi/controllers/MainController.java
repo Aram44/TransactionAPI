@@ -3,16 +3,20 @@ package com.example.transactionapi.controllers;
 import com.example.transactionapi.models.Account;
 import com.example.transactionapi.models.Status;
 import com.example.transactionapi.models.Transaction;
+import com.example.transactionapi.models.User;
 import com.example.transactionapi.repository.AccountRepository;
 import com.example.transactionapi.repository.TransactionRepository;
+import com.example.transactionapi.repository.UserRepository;
 import com.example.transactionapi.services.ActionService;
-import com.example.transactionapi.services.NotificationService;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,30 +24,54 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/")
 @CrossOrigin(origins = "*")
 public class MainController{
 
+    private Logger logger = LoggerFactory.getLogger(UserController.class);
     @Autowired
     private TransactionRepository transactionRepository;
     @Autowired
     private AccountRepository accountRepository;
     @Autowired
-    private NotificationService notificationService;
+    private UserRepository userRepository;
     @Autowired
     private ActionService actionService;
 
     @GetMapping("/alltransactions")
-    public ResponseEntity<Page<Transaction>> findAll(Pageable pageable) {
+    @ResponseBody
+    public ResponseEntity<Page<Transaction>> findAll(@PageableDefault(page = 0, size = 20) Pageable pageable) {
         return new ResponseEntity<>(transactionRepository.findAll(pageable), HttpStatus.OK);
     }
 
     @GetMapping("/transaction/view/{id}")
-    public ResponseEntity<Transaction> findByID(@PathVariable Integer id) {
-        return new ResponseEntity<>(transactionRepository.findById(id).get(), HttpStatus.OK);
+    public ResponseEntity<Map<String,String>> findByID(@PathVariable Integer id) {
+        Map<String,String> result = new HashMap<>();
+        try {
+            Transaction transaction = transactionRepository.findById(id).get();
+            Account senderAccount = accountRepository.findById(transaction.getSender()).get();
+            Account receiverAccount = accountRepository.findById(transaction.getReceiver()).get();
+            User sender = userRepository.findById(senderAccount.getUid()).get();
+            User receiver = userRepository.findById(receiverAccount.getUid()).get();
+            result.put("sender",String.valueOf(transaction.getSender()));
+            result.put("receiver",String.valueOf(transaction.getReceiver()));
+            result.put("senderName",sender.getName());
+            result.put("receiverName",receiver.getName());
+            result.put("senderEmail",sender.getEmail());
+            result.put("receiverEmail",receiver.getEmail());
+            result.put("balance",String.valueOf(transaction.getBalance()));
+            result.put("status",String.valueOf(transaction.getStatus()));
+            result.put("sendtime",String.valueOf(transaction.getSendtime()));
+            result.put("type",String.valueOf(transaction.getType()));
+        }catch (Exception e){
+            logger.error(e.getMessage());
+        }
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping("/transaction/{action}/{id}")
@@ -61,7 +89,7 @@ public class MainController{
                     }else {
                         status = Status.CANCELED;
                     }
-//                    actionService.TransactionNotify(id,status);
+                    actionService.TransactionNotify(id,status);
                     transaction.setStatus(status);
                     transactionRepository.save(transaction);
                     jsonObject.put("message","Added");
@@ -96,7 +124,6 @@ public class MainController{
                 transaction.setSendtime(LocalDateTime.now());
                 transactionRepository.save(transaction);
                 jsonObject.put("message","Transaction Saved");
-//        notificationService.SendNotification(email,"Transaction Added");
             }else {
                 jsonObject.put("message","Transaction Error!");
             }

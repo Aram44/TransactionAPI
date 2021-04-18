@@ -31,7 +31,7 @@ public class AccountController{
             account.setBalance(0);
             account.setReserv(0);
             accountRepository.save(account);
-            jsonObject.put("message","Added");
+            jsonObject.put("message","Account created Successfuly!");
         } catch (JSONException e) {
             e.printStackTrace();
         }

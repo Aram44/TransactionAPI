@@ -1,5 +1,7 @@
 package com.example.transactionapi.services;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
 import javax.mail.*;
@@ -8,17 +10,21 @@ import javax.mail.internet.MimeMessage;
 import java.util.Properties;
 
 @Service
+@PropertySource("classpath:emailSend.properties")
 public class NotificationService {
-    public Boolean SendNotification(String email,String mes) {
 
-        final String username = "vtpro719i1@gmail.com";
-        final String password = "719i12019";
+    @Value("${emailSend.username}")
+    private String username;
+    @Value("${emailSend.password}")
+    private String password;
+
+    public Boolean SendNotification(String email,String mes) {
 
         Properties prop = new Properties();
         prop.put("mail.smtp.host", "smtp.gmail.com");
         prop.put("mail.smtp.port", "587");
         prop.put("mail.smtp.auth", "true");
-        prop.put("mail.smtp.starttls.enable", "true"); //TLS
+        prop.put("mail.smtp.starttls.enable", "true");
 
         Session session = Session.getInstance(prop,
                 new javax.mail.Authenticator() {
