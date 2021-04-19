@@ -20,6 +20,7 @@ public class Transaction {
     private Integer sender;
     private Integer receiver;
     private int balance;
+    private float fee;
     private Status status;
     @Convert(converter = LocalDateTimeConverter.class)
     private LocalDateTime sendtime;
@@ -55,6 +56,14 @@ public class Transaction {
 
     public void setBalance(int balance) {
         this.balance = balance;
+    }
+
+    public float getFee() {
+        return fee;
+    }
+
+    public void setFee(float fee) {
+        this.fee = fee;
     }
 
     public Status getStatus() {

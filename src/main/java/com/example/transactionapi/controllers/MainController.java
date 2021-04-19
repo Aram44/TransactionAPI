@@ -120,8 +120,10 @@ public class MainController{
         JSONObject jsonObject = new JSONObject();
         System.out.println();
         try {
-            if (actionService.TransactionSave(transaction.getSender(),transaction.getReceiver(),transaction.getBalance(),transaction.getType())){
+            float fee = actionService.TransactionSave(transaction.getSender(),transaction.getReceiver(),transaction.getBalance(),transaction.getType());
+            if (fee>999){
                 transaction.setSendtime(LocalDateTime.now());
+                transaction.setFee(fee);
                 transactionRepository.save(transaction);
                 jsonObject.put("message","Transaction Saved");
             }else {

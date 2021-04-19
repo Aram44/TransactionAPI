@@ -43,27 +43,30 @@ public class ActionService {
             notificationService.SendNotification(sender.getEmail(),"Transaction Canceled!");
         }
     }
-    public boolean TransactionSave(Integer sid, Integer rid, Integer bal, Type type){
+    public float TransactionSave(Integer sid, Integer rid, Integer bal, Type type){
         try {
             Account sender = accountRepository.findById(sid).get();
+            float fee = (float) (bal*0.1>1000 ? bal*0.1 : 1000.0);
             if (sender!=null){
                 if (type == Type.DEPOSIT){
-                    return true;
+                    if (bal+1000>fee) {
+                        return fee;
+                    }
                 }else if(type == Type.WITHDRAWAL){
-                    if (sender.getBalance()>=bal){
+                    if (sender.getBalance()>=bal+fee){
                         sender.setBalance(sender.getBalance()-bal);
                         sender.setReserv(sender.getReserv()+bal);
                         accountRepository.save(sender);
-                        return true;
+                        return fee;
                     }
                 }else {
                     Account receiver = accountRepository.findById(rid).get();
                     if (receiver!=null){
-                        if (sender.getBalance()>=bal){
+                        if (sender.getBalance()>=bal+fee){
                             sender.setBalance(sender.getBalance()-bal);
                             sender.setReserv(sender.getReserv()+bal);
                             accountRepository.save(sender);
-                            return true;
+                            return fee;
                         }
                     }
                 }
@@ -71,7 +74,7 @@ public class ActionService {
         }catch (Exception e){
             e.getMessage();
         }
-        return false;
+        return 0;
     }
     public boolean Transaction(Integer tid, Status status){
         try {
