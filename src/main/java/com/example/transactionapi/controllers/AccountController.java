@@ -1,7 +1,7 @@
 package com.example.transactionapi.controllers;
 
-import com.example.transactionapi.models.Account;
-import com.example.transactionapi.repository.AccountRepository;
+import com.example.transactionapi.models.utils.Account;
+import com.example.transactionapi.repository.user.AccountRepository;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;

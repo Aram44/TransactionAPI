@@ -1,4 +1,4 @@
-package com.example.transactionapi.models;
+package com.example.transactionapi.models.utils;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;

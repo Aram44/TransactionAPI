@@ -1,11 +1,13 @@
 package com.example.transactionapi.services;
 
 import com.example.transactionapi.models.*;
-import com.example.transactionapi.repository.AccountRepository;
-import com.example.transactionapi.repository.TransactionRepository;
+import com.example.transactionapi.models.utils.Account;
+import com.example.transactionapi.models.utils.Status;
+import com.example.transactionapi.models.utils.Type;
+import com.example.transactionapi.repository.user.AccountRepository;
+import com.example.transactionapi.repository.user.TransactionRepository;
 import com.example.transactionapi.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
 
@@ -22,49 +24,66 @@ public class ActionService {
 
     public void TransactionNotify(Integer id, Status status){
         Transaction transaction = transactionRepository.findById(id).get();
-        Account senderAccount = accountRepository.findById(transaction.getSender()).get();
-        Account receiverAccount = accountRepository.findById(transaction.getReceiver()).get();
-        User sender = userRepository.findById(senderAccount.getUid()).get();
-        User receiver = userRepository.findById(receiverAccount.getUid()).get();
-        if (status == Status.DONE){
-            if (receiver!=null){
-                notificationService.SendNotification(receiver.getEmail(),"Transaction Applyed!");
-            }
-            notificationService.SendNotification(sender.getEmail(),"Transaction Applyed!");
-        }else if (status == Status.REFUSED){
-            if (receiver!=null){
-                notificationService.SendNotification(receiver.getEmail(),"Transaction Refused!");
-            }
-            notificationService.SendNotification(sender.getEmail(),"Transaction Refused!");
+        if (transaction.getType()== Type.WITHDRAWAL){
+            Account senderAccount = accountRepository.findById(transaction.getSender()).get();
+            User sender = userRepository.findById(senderAccount.getUid()).get();
+            System.out.println(sender.getName());
+            CheckAndSend(sender.getEmail(), "",status,id);
+        }else if(transaction.getType()==Type.DEPOSIT){
+            Account receiverAccount = accountRepository.findById(transaction.getReceiver()).get();
+            User receiver = userRepository.findById(receiverAccount.getUid()).get();
+            CheckAndSend(receiver.getEmail(), "",status,id);
         }else{
-            if (receiver!=null){
-                notificationService.SendNotification(receiver.getEmail(),"Transaction Canceled!");
-            }
-            notificationService.SendNotification(sender.getEmail(),"Transaction Canceled!");
+            Account senderAccount = accountRepository.findById(transaction.getSender()).get();
+            User sender = userRepository.findById(senderAccount.getUid()).get();
+            Account receiverAccount = accountRepository.findById(transaction.getReceiver()).get();
+            User receiver = userRepository.findById(receiverAccount.getUid()).get();
+            CheckAndSend(sender.getEmail(), receiver.getEmail(), status,id);
         }
+    }
+    public boolean CheckAndSend(String senderEmail, String receiverEmail,Status status,Integer id){
+        if (status == Status.DONE){
+            if (receiverEmail.equals("")){
+                notificationService.SendNotification(receiverEmail,"Transaction "+id+" Applyed!");
+            }
+            notificationService.SendNotification(senderEmail,"Transaction "+id+" Applyed!");
+        }else if (status == Status.REFUSED){
+            if (receiverEmail.equals("")){
+                notificationService.SendNotification(receiverEmail,"Transaction "+id+" Refused!");
+            }
+            notificationService.SendNotification(senderEmail,"Transaction "+id+" Refused!");
+        }else{
+            if (receiverEmail.equals("")){
+                notificationService.SendNotification(receiverEmail,"Transaction "+id+" Canceled!");
+            }
+            notificationService.SendNotification(senderEmail,"Transaction "+id+" Canceled!");
+        }
+        return false;
     }
     public float TransactionSave(Integer sid, Integer rid, Integer bal, Type type){
         try {
             Account sender = accountRepository.findById(sid).get();
             float fee = (float) (bal*0.1>1000 ? bal*0.1 : 1000.0);
+            int feeball = (int)Math.ceil(fee+bal);
             if (sender!=null){
                 if (type == Type.DEPOSIT){
                     if (bal+1000>fee) {
                         return fee;
                     }
                 }else if(type == Type.WITHDRAWAL){
-                    if (sender.getBalance()>=bal+fee){
-                        sender.setBalance(sender.getBalance()-bal);
-                        sender.setReserv(sender.getReserv()+bal);
+                    System.out.println(sender.getBalance()+" "+feeball);
+                    if (sender.getBalance()>=feeball){
+                        sender.setBalance(sender.getBalance()-feeball);
+                        sender.setReserv(sender.getReserv()+feeball);
                         accountRepository.save(sender);
                         return fee;
                     }
                 }else {
                     Account receiver = accountRepository.findById(rid).get();
                     if (receiver!=null){
-                        if (sender.getBalance()>=bal+fee){
-                            sender.setBalance(sender.getBalance()-bal);
-                            sender.setReserv(sender.getReserv()+bal);
+                        if (sender.getBalance()>=feeball){
+                            sender.setBalance(sender.getBalance()-feeball);
+                            sender.setReserv(sender.getReserv()+feeball);
                             accountRepository.save(sender);
                             return fee;
                         }
@@ -85,19 +104,24 @@ public class ActionService {
                     if (transaction.getType()==Type.INTERNAL){
                         Account receiver = accountRepository.findById(transaction.getReceiver()).get();
                         sender.setReserv(sender.getReserv()-transaction.getBalance());
-                        receiver.setBalance(receiver.getBalance()+transaction.getBalance());
+                        receiver.setBalance(receiver.getBalance()+(transaction.getBalance()+(int)transaction.getFee()));
                         accountRepository.save(sender);
                         accountRepository.save(receiver);
                         return true;
                     }else if (transaction.getType()==Type.DEPOSIT){
-                        sender.setBalance(sender.getBalance()+transaction.getBalance());
+                        sender.setBalance(sender.getBalance()+(transaction.getBalance()+(int)transaction.getFee()));
                         accountRepository.save(sender);
                         return true;
                     }else {
-                        sender.setReserv(sender.getReserv()-transaction.getBalance());
+                        sender.setReserv(sender.getReserv()-(transaction.getBalance()+(int)transaction.getFee()));
                         accountRepository.save(sender);
                         return true;
                     }
+                }else{
+                    sender.setBalance(sender.getBalance()+(transaction.getBalance()+(int)transaction.getFee()));
+                    sender.setReserv(sender.getReserv()-(transaction.getBalance()+(int)transaction.getFee()));
+                    accountRepository.save(sender);
+                    return true;
                 }
             }
         }catch (Exception e){

@@ -1,5 +1,8 @@
 package com.example.transactionapi.models;
 
+import com.example.transactionapi.models.utils.LocalDateTimeConverter;
+import com.example.transactionapi.models.utils.Status;
+import com.example.transactionapi.models.utils.Type;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

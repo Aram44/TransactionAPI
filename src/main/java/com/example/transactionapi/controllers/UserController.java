@@ -3,7 +3,7 @@ package com.example.transactionapi.controllers;
 import com.example.transactionapi.config.JwtTokenProvider;
 import com.example.transactionapi.models.Role;
 import com.example.transactionapi.models.User;
-import com.example.transactionapi.repository.RoleRepository;
+import com.example.transactionapi.repository.user.RoleRepository;
 import com.example.transactionapi.repository.UserRepository;
 import com.example.transactionapi.services.NotificationService;
 import org.codehaus.jettison.json.JSONException;

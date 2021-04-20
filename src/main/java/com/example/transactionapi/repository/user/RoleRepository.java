@@ -1,4 +1,4 @@
-package com.example.transactionapi.repository;
+package com.example.transactionapi.repository.user;
 
 import com.example.transactionapi.models.Role;
 import org.springframework.data.repository.PagingAndSortingRepository;

@@ -42,6 +42,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean(name = BeanIds.AUTHENTICATION_MANAGER)
+//    use provider
 
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
@@ -51,12 +52,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().disable();
-        http.csrf().disable().authorizeRequests().antMatchers("/api/v1/auth/authenticate")
-                .permitAll().antMatchers(HttpMethod.OPTIONS, "/**")
-                .permitAll().anyRequest().authenticated()
-                .and().exceptionHandling().and().sessionManagement()
+        http.httpBasic().disable();
+        http.formLogin().disable();
+        http.csrf().disable().authorizeRequests()
+                .antMatchers("/api/v1/auth/authenticate").permitAll()
+                .antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .anyRequest().authenticated()
+                    .and().exceptionHandling()
+                    .and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
+//        http.authenticationProvider()
     }
 
 }

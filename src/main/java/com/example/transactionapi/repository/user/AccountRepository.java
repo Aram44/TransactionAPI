@@ -1,10 +1,8 @@
-package com.example.transactionapi.repository;
+package com.example.transactionapi.repository.user;
 
-import com.example.transactionapi.models.Account;
-import com.example.transactionapi.models.User;
+import com.example.transactionapi.models.utils.Account;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;

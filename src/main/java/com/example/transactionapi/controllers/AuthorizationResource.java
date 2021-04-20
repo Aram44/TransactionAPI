@@ -1,7 +1,7 @@
 package com.example.transactionapi.controllers;
 
 import com.example.transactionapi.config.JwtTokenProvider;
-import com.example.transactionapi.models.AuthRequest;
+import com.example.transactionapi.models.utils.AuthRequest;
 import com.example.transactionapi.models.User;
 import com.example.transactionapi.repository.UserRepository;
 import org.codehaus.jettison.json.JSONObject;

@@ -1,4 +1,4 @@
-package com.example.transactionapi.models;
+package com.example.transactionapi.models.utils;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
