@@ -19,8 +19,8 @@ public class Account {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Integer id;
     private Integer uid;
-    private Integer balance;
-    private Integer reserv;
+    private double balance;
+    private double reserv;
 
     public Integer getId() {
         return id;
@@ -38,19 +38,19 @@ public class Account {
         this.uid = uid;
     }
 
-    public Integer getBalance() {
+    public double getBalance() {
         return balance;
     }
 
-    public void setBalance(Integer balance) {
+    public void setBalance(double balance) {
         this.balance = balance;
     }
 
-    public Integer getReserv() {
+    public double getReserv() {
         return reserv;
     }
 
-    public void setReserv(Integer reserv) {
+    public void setReserv(double reserv) {
         this.reserv = reserv;
     }
 }

@@ -23,7 +23,7 @@ public class Schedule {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Integer id;
     private Integer lid;
-    private float balance;
+    private double balance;
     private int month;
     private LocalDateTime paymantdate;
     private float monthly;
@@ -48,11 +48,11 @@ public class Schedule {
         this.lid = lid;
     }
 
-    public float getBalance() {
+    public double getBalance() {
         return balance;
     }
 
-    public void setBalance(float balance) {
+    public void setBalance(double balance) {
         this.balance = balance;
     }
 

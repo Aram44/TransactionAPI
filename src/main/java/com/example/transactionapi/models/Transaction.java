@@ -22,8 +22,9 @@ public class Transaction {
     private Integer id;
     private Integer sender;
     private Integer receiver;
-    private int balance;
+    private double balance;
     private float fee;
+    private int month;
     private Status status;
     @Convert(converter = LocalDateTimeConverter.class)
     private LocalDateTime sendtime;
@@ -53,11 +54,11 @@ public class Transaction {
         this.receiver = receiver;
     }
 
-    public int getBalance() {
+    public double getBalance() {
         return balance;
     }
 
-    public void setBalance(int balance) {
+    public void setBalance(double balance) {
         this.balance = balance;
     }
 
@@ -67,6 +68,14 @@ public class Transaction {
 
     public void setFee(float fee) {
         this.fee = fee;
+    }
+
+    public int getMonth() {
+        return month;
+    }
+
+    public void setMonth(int month) {
+        this.month = month;
     }
 
     public Status getStatus() {

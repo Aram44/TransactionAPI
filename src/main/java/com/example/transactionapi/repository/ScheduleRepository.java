@@ -16,4 +16,5 @@ import java.util.List;
 @Repository
 public interface ScheduleRepository extends JpaRepository<Schedule, Integer> {
     Page<Schedule> findAllByLid(Integer lid, Pageable pageable);
+    Schedule findByMonth(Integer month);
 }

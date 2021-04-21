@@ -1,24 +1,34 @@
 package com.example.transactionapi.services;
 
+import com.example.transactionapi.controllers.UserController;
 import com.example.transactionapi.models.*;
 import com.example.transactionapi.models.utils.Account;
 import com.example.transactionapi.models.utils.Status;
 import com.example.transactionapi.models.utils.Type;
+import com.example.transactionapi.repository.LoanRepository;
+import com.example.transactionapi.repository.ScheduleRepository;
 import com.example.transactionapi.repository.user.AccountRepository;
 import com.example.transactionapi.repository.user.TransactionRepository;
 import com.example.transactionapi.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
 @Service
 public class ActionService {
+    private Logger logger = LoggerFactory.getLogger(UserController.class);
     @Autowired
     private TransactionRepository transactionRepository;
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private AccountRepository accountRepository;
+    @Autowired
+    private ScheduleRepository scheduleRepository;
+    @Autowired
+    private LoanRepository loanRepository;
     @Autowired
     private NotificationService notificationService;
 
@@ -60,7 +70,26 @@ public class ActionService {
         }
         return false;
     }
-    public float TransactionSave(Integer sid, Integer rid, Integer bal, Type type){
+    public boolean TransactionLoan(Integer aid,Integer lid, double balance, Integer month){
+        try {
+            Account sender = accountRepository.findById(aid).get();
+            if (sender.getBalance()>=balance){
+                Schedule schedule = scheduleRepository.findByMonth(month);
+                sender.setBalance(sender.getBalance()-balance);
+                schedule.setBalance(schedule.getBalance()+balance);
+                if (schedule.getMonthly()<=balance){
+                    schedule.setStatus(Status.DONE);
+                }
+                accountRepository.save(sender);
+                scheduleRepository.save(schedule);
+                return true;
+            }
+        }catch (Exception e){
+            logger.error(e.getMessage());
+        }
+        return false;
+    }
+    public float TransactionSave(Integer sid, Integer rid, double bal, Type type){
         try {
             Account sender = accountRepository.findById(sid).get();
             float fee = (float) (bal*0.1>1000 ? bal*0.1 : 1000.0);

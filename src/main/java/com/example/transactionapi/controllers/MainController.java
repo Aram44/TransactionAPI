@@ -3,6 +3,7 @@ package com.example.transactionapi.controllers;
 import com.example.transactionapi.models.utils.Account;
 import com.example.transactionapi.models.utils.Status;
 import com.example.transactionapi.models.Transaction;
+import com.example.transactionapi.models.utils.Type;
 import com.example.transactionapi.repository.user.AccountRepository;
 import com.example.transactionapi.repository.user.TransactionRepository;
 import com.example.transactionapi.services.ActionService;
@@ -94,18 +95,23 @@ public class MainController{
 
     @PostMapping("/transaction")
     public ResponseEntity<String> save(@RequestBody Transaction transaction) {
+        System.out.println(transaction.getMonth());
         JSONObject jsonObject = new JSONObject();
         try {
-            float fee = actionService.TransactionSave(transaction.getSender(),transaction.getReceiver(),transaction.getBalance(),transaction.getType());
-            if (fee>999){
-                transaction.setSendtime(LocalDateTime.now());
-                transaction.setFee(fee);
-                transactionRepository.save(transaction);
+            if (transaction.getType()==Type.LOAN){
+                actionService.TransactionLoan(transaction.getSender(),transaction.getReceiver(),transaction.getBalance(),transaction.getMonth());
                 jsonObject.put("message","Transaction Saved");
-            }else {
-                jsonObject.put("message","You don't have enough funds in your account");
+            }else{
+                float fee = actionService.TransactionSave(transaction.getSender(),transaction.getReceiver(),transaction.getBalance(),transaction.getType());
+                if (fee>999){
+                    transaction.setSendtime(LocalDateTime.now());
+                    transaction.setFee(fee);
+                    transactionRepository.save(transaction);
+                    jsonObject.put("message","Transaction Saved");
+                }else {
+                    jsonObject.put("message","You don't have enough funds in your account");
+                }
             }
-
         } catch (JSONException e) {
             e.printStackTrace();
         }

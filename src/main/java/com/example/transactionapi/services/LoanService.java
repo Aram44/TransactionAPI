@@ -83,7 +83,6 @@ public class LoanService {
             Page<Loan> page = new PageImpl<>(listLoan);
             return new ResponseEntity<>(page, HttpStatus.OK);
         }
-        System.out.println("ok");
         return new ResponseEntity<>(loanRepository.findAll(pageable), HttpStatus.OK);
     }
 
@@ -94,7 +93,7 @@ public class LoanService {
                 if (status==Status.DONE){
                     List<Schedule> scheduleList = new ArrayList<>();
                     for (int i = 1; i <= loan.getMonths(); i++) {
-                        scheduleList.add(new Schedule(null,loan.getId(),0f,i,LocalDateTime.now(),loan.getMonthly(),Status.PROCESS));
+                        scheduleList.add(new Schedule(null,loan.getId(),0f,i,LocalDateTime.now().plusMonths(i),loan.getMonthly(),Status.PROCESS));
                     }
                     scheduleRepository.saveAll(scheduleList);
                     loan.setChangetime(LocalDateTime.now());
