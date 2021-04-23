@@ -3,6 +3,7 @@ package com.example.transactionapi.controllers;
 import com.example.transactionapi.config.JwtTokenProvider;
 import com.example.transactionapi.models.Role;
 import com.example.transactionapi.models.User;
+import com.example.transactionapi.repository.user.AccountRepository;
 import com.example.transactionapi.repository.user.RoleRepository;
 import com.example.transactionapi.repository.UserRepository;
 import com.example.transactionapi.services.NotificationService;
@@ -24,14 +25,21 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "*")
 public class UserController{
     private Logger logger = LoggerFactory.getLogger(UserController.class);
-    @Autowired
+
     private UserRepository userRepository;
-    @Autowired
     private RoleRepository roleRepository;
-    @Autowired
     private NotificationService notificationService;
+    private AccountRepository accountRepository;
+    private JwtTokenProvider jwtTokenProvider;
+
     @Autowired
-    JwtTokenProvider jwtTokenProvider;
+    public UserController(UserRepository userRepository, RoleRepository roleRepository, NotificationService notificationService, AccountRepository accountRepository,JwtTokenProvider jwtTokenProvider) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.notificationService = notificationService;
+        this.accountRepository = accountRepository;
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
 
     @GetMapping("/allusers")
     public ResponseEntity<Page<User>> findAll(Pageable pageable) {

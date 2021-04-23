@@ -1,16 +1,13 @@
 package com.example.transactionapi.models;
 
+import com.example.transactionapi.models.enums.Status;
 import com.example.transactionapi.models.utils.LocalDateTimeConverter;
-import com.example.transactionapi.models.utils.Status;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Data
@@ -18,10 +15,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 public class Schedule {
-    @javax.persistence.Id
-    @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Integer id;
+    @Column(name="loan_id")
     private Integer lid;
     private double balance;
     private int month;
@@ -36,14 +31,19 @@ public class Schedule {
         return id;
     }
 
+    @javax.persistence.Id
+    @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     public void setId(Integer id) {
         this.id = id;
     }
 
+    @Column(name="loan_id")
     public Integer getLid() {
         return lid;
     }
 
+    @Column(name="loan_id")
     public void setLid(Integer lid) {
         this.lid = lid;
     }

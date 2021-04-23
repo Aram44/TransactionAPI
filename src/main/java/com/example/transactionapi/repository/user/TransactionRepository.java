@@ -1,7 +1,7 @@
 package com.example.transactionapi.repository.user;
 
 
-import com.example.transactionapi.models.utils.Status;
+import com.example.transactionapi.models.enums.Status;
 import com.example.transactionapi.models.Transaction;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

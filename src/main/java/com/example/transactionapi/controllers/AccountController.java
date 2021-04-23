@@ -26,6 +26,7 @@ public class AccountController{
 
     @PostMapping("/create")
     public ResponseEntity<String> create(@RequestBody Account account) {
+        System.out.println(account.getCurrency());
         JSONObject jsonObject = new JSONObject();
         try {
             account.setBalance(0);

@@ -1,10 +1,12 @@
 package com.example.transactionapi.models.utils;
 
+import com.example.transactionapi.models.enums.Currency;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -18,7 +20,9 @@ public class Account {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Integer id;
+    @Column(name="user_id")
     private Integer uid;
+    private Currency currency;
     private double balance;
     private double reserv;
 
@@ -32,6 +36,14 @@ public class Account {
 
     public Integer getUid() {
         return uid;
+    }
+
+    public Currency getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(Currency currency) {
+        this.currency = currency;
     }
 
     public void setUid(Integer uid) {

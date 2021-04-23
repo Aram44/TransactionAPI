@@ -3,8 +3,8 @@ package com.example.transactionapi.services;
 import com.example.transactionapi.controllers.UserController;
 import com.example.transactionapi.models.*;
 import com.example.transactionapi.models.utils.Account;
-import com.example.transactionapi.models.utils.Status;
-import com.example.transactionapi.models.utils.Type;
+import com.example.transactionapi.models.enums.Status;
+import com.example.transactionapi.models.enums.Type;
 import com.example.transactionapi.repository.LoanRepository;
 import com.example.transactionapi.repository.ScheduleRepository;
 import com.example.transactionapi.repository.user.AccountRepository;
@@ -15,22 +15,27 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-
 @Service
 public class ActionService {
     private Logger logger = LoggerFactory.getLogger(UserController.class);
-    @Autowired
+
     private TransactionRepository transactionRepository;
-    @Autowired
     private UserRepository userRepository;
-    @Autowired
     private AccountRepository accountRepository;
-    @Autowired
     private ScheduleRepository scheduleRepository;
-    @Autowired
     private LoanRepository loanRepository;
-    @Autowired
     private NotificationService notificationService;
+
+
+    @Autowired
+    public ActionService(TransactionRepository transactionRepository, UserRepository userRepository, AccountRepository accountRepository, ScheduleRepository scheduleRepository, LoanRepository loanRepository, NotificationService notificationService){
+        this.transactionRepository = transactionRepository;
+        this.userRepository = userRepository;
+        this.accountRepository = accountRepository;
+        this.scheduleRepository = scheduleRepository;
+        this.loanRepository = loanRepository;
+        this.notificationService = notificationService;
+    }
 
     public void TransactionNotify(Integer id, Status status){
         Transaction transaction = transactionRepository.findById(id).get();
@@ -57,24 +62,29 @@ public class ActionService {
                 notificationService.SendNotification(receiverEmail,"Transaction "+id+" Applyed!");
             }
             notificationService.SendNotification(senderEmail,"Transaction "+id+" Applyed!");
+            return true;
         }else if (status == Status.REFUSED){
             if (receiverEmail.equals("")){
                 notificationService.SendNotification(receiverEmail,"Transaction "+id+" Refused!");
             }
             notificationService.SendNotification(senderEmail,"Transaction "+id+" Refused!");
+            return true;
         }else{
             if (receiverEmail.equals("")){
                 notificationService.SendNotification(receiverEmail,"Transaction "+id+" Canceled!");
             }
             notificationService.SendNotification(senderEmail,"Transaction "+id+" Canceled!");
+            return true;
         }
-        return false;
     }
-    public boolean TransactionLoan(Integer aid,Integer lid, double balance, Integer month){
+
+    public boolean TransactionLoan(Integer aid,Integer lid, double balance, int month){
         try {
             Account sender = accountRepository.findById(aid).get();
             if (sender.getBalance()>=balance){
-                Schedule schedule = scheduleRepository.findByMonth(month);
+                System.out.println(sender.getBalance()+" "+lid+" "+balance+" "+month);
+                Schedule schedule = scheduleRepository.findByLidAndMonth(lid, month);
+                System.out.println(schedule);
                 sender.setBalance(sender.getBalance()-balance);
                 schedule.setBalance(schedule.getBalance()+balance);
                 if (schedule.getMonthly()<=balance){
@@ -89,16 +99,16 @@ public class ActionService {
         }
         return false;
     }
-    public float TransactionSave(Integer sid, Integer rid, double bal, Type type){
+    public float TransactionSave(Integer sid, double bal, Type type){
         try {
             Account sender = accountRepository.findById(sid).get();
             float fee = (float) (bal*0.1>1000 ? bal*0.1 : 1000.0);
             int feeball = (int)Math.ceil(fee+bal);
             if (sender!=null){
                 if (type == Type.DEPOSIT){
-                    if (bal+1000>fee) {
-                        return fee;
-                    }
+                    sender.setBalance(sender.getBalance()+bal);
+                    accountRepository.save(sender);
+                    return 1;
                 }else if(type == Type.WITHDRAWAL){
                     System.out.println(sender.getBalance()+" "+feeball);
                     if (sender.getBalance()>=feeball){
@@ -106,16 +116,6 @@ public class ActionService {
                         sender.setReserv(sender.getReserv()+feeball);
                         accountRepository.save(sender);
                         return fee;
-                    }
-                }else {
-                    Account receiver = accountRepository.findById(rid).get();
-                    if (receiver!=null){
-                        if (sender.getBalance()>=feeball){
-                            sender.setBalance(sender.getBalance()-feeball);
-                            sender.setReserv(sender.getReserv()+feeball);
-                            accountRepository.save(sender);
-                            return fee;
-                        }
                     }
                 }
             }
@@ -155,6 +155,25 @@ public class ActionService {
             }
         }catch (Exception e){
             e.getMessage();
+        }
+        return false;
+    }
+
+
+    public boolean TransactionInternalSave(Integer sid, Integer rid, double balance) {
+        try{
+            Account sender = accountRepository.findById(sid).get();
+            Account receiver = accountRepository.findById(rid).get();
+            if (receiver!=null){
+                if (sender.getBalance()>=balance){
+                    sender.setBalance(sender.getBalance()-balance);
+                    sender.setReserv(sender.getReserv()+balance);
+                    accountRepository.save(sender);
+                    return true;
+                }
+            }
+        }catch (Exception e){
+            logger.error(e.getMessage());
         }
         return false;
     }

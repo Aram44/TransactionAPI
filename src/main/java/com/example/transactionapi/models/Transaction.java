@@ -1,11 +1,12 @@
 package com.example.transactionapi.models;
 
+import com.example.transactionapi.models.enums.Status;
+import com.example.transactionapi.models.enums.Type;
 import com.example.transactionapi.models.utils.LocalDateTimeConverter;
-import com.example.transactionapi.models.utils.Status;
-import com.example.transactionapi.models.utils.Type;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.Id;
 
 import javax.persistence.*;
@@ -26,7 +27,6 @@ public class Transaction {
     private float fee;
     private int month;
     private Status status;
-    @Convert(converter = LocalDateTimeConverter.class)
     private LocalDateTime sendtime;
     private Type type;
 
@@ -86,10 +86,14 @@ public class Transaction {
         this.status = status;
     }
 
+    @Convert(converter = LocalDateTimeConverter.class)
+    @CreationTimestamp
     public LocalDateTime getSendtime() {
         return sendtime;
     }
 
+    @Convert(converter = LocalDateTimeConverter.class)
+    @CreationTimestamp
     public void setSendtime(LocalDateTime sendtime) {
         this.sendtime = sendtime;
     }

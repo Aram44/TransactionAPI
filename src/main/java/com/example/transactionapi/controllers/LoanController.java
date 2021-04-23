@@ -2,7 +2,7 @@ package com.example.transactionapi.controllers;
 
 import com.example.transactionapi.models.Loan;
 import com.example.transactionapi.models.Schedule;
-import com.example.transactionapi.models.utils.Status;
+import com.example.transactionapi.models.enums.Status;
 import com.example.transactionapi.models.Transaction;
 import com.example.transactionapi.repository.LoanRepository;
 import com.example.transactionapi.repository.ScheduleRepository;
@@ -20,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/loan")
@@ -43,6 +42,10 @@ public class LoanController {
     @GetMapping("/view/{id}")
     public ResponseEntity<Page<Schedule>> findByID(@PathVariable Integer id, @PageableDefault(page = 0, size = 20) Pageable pageable) {
         return new ResponseEntity<>(scheduleRepository.findAllByLid(id,pageable), HttpStatus.OK);
+    }
+    @GetMapping("/viewloan/{id}")
+    public ResponseEntity<Loan> findAllByID(@PathVariable Integer id) {
+        return new ResponseEntity<>(loanRepository.findById(id).get(), HttpStatus.OK);
     }
 
     @GetMapping("/loan/{action}/{id}")
@@ -80,12 +83,13 @@ public class LoanController {
 
     @PostMapping("/loan")
     public ResponseEntity<String> save(@RequestBody Loan loan) {
+        System.out.println(loan.getUid());
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("message", "Loan Saved");
             loan.setRequesttime(LocalDateTime.now());
             loan.setChangetime(LocalDateTime.now());
             loanRepository.save(loan);
+            jsonObject.put("message", "Loan Saved");
         } catch (JSONException e) {
             e.printStackTrace();
         }

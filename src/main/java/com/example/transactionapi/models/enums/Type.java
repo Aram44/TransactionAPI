@@ -1,4 +1,4 @@
-package com.example.transactionapi.models.utils;
+package com.example.transactionapi.models.enums;
 
 
 public enum Type {

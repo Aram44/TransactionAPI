@@ -3,7 +3,7 @@ package com.example.transactionapi.services;
 import com.example.transactionapi.controllers.UserController;
 import com.example.transactionapi.models.*;
 import com.example.transactionapi.models.utils.Account;
-import com.example.transactionapi.models.utils.Status;
+import com.example.transactionapi.models.enums.Status;
 import com.example.transactionapi.repository.ScheduleRepository;
 import com.example.transactionapi.repository.user.AccountRepository;
 import com.example.transactionapi.repository.LoanRepository;
@@ -24,12 +24,17 @@ import java.util.List;
 @Service
 public class LoanService {
     private Logger logger = LoggerFactory.getLogger(UserController.class);
-    @Autowired
+
     private LoanRepository loanRepository;
-    @Autowired
     private AccountRepository accountRepository;
-    @Autowired
     private ScheduleRepository scheduleRepository;
+
+    @Autowired
+    public LoanService(LoanRepository loanRepository, AccountRepository accountRepository, ScheduleRepository scheduleRepository){
+        this.loanRepository = loanRepository;
+        this.accountRepository = accountRepository;
+        this.scheduleRepository = scheduleRepository;
+    }
 
     public ResponseEntity<Page<Loan>> ShowLaoads(String start, String end, int status, String uid, Pageable pageable){
         if (!start.equals("none") || !end.equals("none")){
@@ -52,13 +57,7 @@ public class LoanService {
                     return new ResponseEntity<>(loanRepository.findAllByStatusAndRequesttimeBetween(state, dateStart, dateEnd, pageable), HttpStatus.OK);
                 }
             }else {
-                List<Account> accountList = accountRepository.findAllByUId(Integer.valueOf(uid));
-                List<Loan> listLoan = new ArrayList<>();
-                for (Account accountItem : accountList) {
-                    List<Loan> list = loanRepository.findAllByAidAndRequesttimeBetween(accountItem.getId(), dateStart, dateEnd);
-                    listLoan.addAll(list);
-                }
-                Page<Loan> page = new PageImpl<>(listLoan);
+                Page<Loan> page = loanRepository.findAllByUidAndRequesttimeBetween(Integer.valueOf(uid), dateStart, dateEnd, pageable);
                 return new ResponseEntity<>(page, HttpStatus.OK);
             }
         }else if(status!=4){
@@ -74,13 +73,7 @@ public class LoanService {
             }
             return new ResponseEntity<>(loanRepository.findAllByStatus(state, pageable), HttpStatus.OK);
         }else if(!uid.equals("none")){
-            List<Account> accountList = accountRepository.findAllByUId(Integer.valueOf(uid));
-            List<Loan> listLoan = new ArrayList<>();
-            for (Account accountItem : accountList) {
-                List<Loan> list = loanRepository.findAllByAid(accountItem.getId());
-                listLoan.addAll(list);
-            }
-            Page<Loan> page = new PageImpl<>(listLoan);
+            Page<Loan> page = loanRepository.findAllByUid(Integer.valueOf(uid), pageable);
             return new ResponseEntity<>(page, HttpStatus.OK);
         }
         return new ResponseEntity<>(loanRepository.findAll(pageable), HttpStatus.OK);
@@ -100,8 +93,10 @@ public class LoanService {
                     loan.setStatus(Status.DONE);
                     loanRepository.save(loan);
                 }else{
-
+                    loan.setStatus(status);
+                    loanRepository.save(loan);
                 }
+                return true;
             }
         }catch (Exception e){
             e.getMessage();

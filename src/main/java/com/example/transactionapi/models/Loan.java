@@ -1,16 +1,13 @@
 package com.example.transactionapi.models;
 
+import com.example.transactionapi.models.enums.Status;
 import com.example.transactionapi.models.utils.LocalDateTimeConverter;
-import com.example.transactionapi.models.utils.Status;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
-import javax.persistence.Convert;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Data
@@ -22,11 +19,14 @@ public class Loan {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Integer id;
-    private Integer aid;
+    @Column(name="user_id")
+    private Integer uid;
     private float amount;
+    private String name;
     private float interest;
     private float monthly;
     private int months;
+    private float percent;
     private Status status;
     @Convert(converter = LocalDateTimeConverter.class)
     private LocalDateTime requesttime;
@@ -41,12 +41,14 @@ public class Loan {
         this.id = id;
     }
 
-    public Integer getAid() {
-        return aid;
+    @Column(name="user_id")
+    public Integer getUid() {
+        return uid;
     }
 
-    public void setAid(Integer aid) {
-        this.aid = aid;
+    @Column(name="user_id")
+    public void setUid(Integer uid) {
+        this.uid = uid;
     }
 
     public float getAmount() {
@@ -55,6 +57,14 @@ public class Loan {
 
     public void setAmount(float amount) {
         this.amount = amount;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public float getInterest() {
@@ -79,6 +89,14 @@ public class Loan {
 
     public void setMonths(int months) {
         this.months = months;
+    }
+
+    public float getPercent() {
+        return percent;
+    }
+
+    public void setPercent(float percent) {
+        this.percent = percent;
     }
 
     public Status getStatus() {
