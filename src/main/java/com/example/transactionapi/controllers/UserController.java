@@ -43,7 +43,7 @@ public class UserController{
 
     @GetMapping("/allusers")
     public ResponseEntity<Page<User>> findAll(Pageable pageable) {
-        return new ResponseEntity<>(userRepository.findAll(pageable), HttpStatus.OK);
+        return new ResponseEntity<>(userRepository.findAllByOrderByIdDesc(pageable), HttpStatus.OK);
     }
 
     public ResponseEntity<User> findByID(Integer id) {

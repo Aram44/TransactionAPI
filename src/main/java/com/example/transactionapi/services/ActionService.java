@@ -2,18 +2,23 @@ package com.example.transactionapi.services;
 
 import com.example.transactionapi.controllers.UserController;
 import com.example.transactionapi.models.*;
+import com.example.transactionapi.models.enums.Currency;
 import com.example.transactionapi.models.utils.Account;
 import com.example.transactionapi.models.enums.Status;
 import com.example.transactionapi.models.enums.Type;
+import com.example.transactionapi.models.utils.Rate;
 import com.example.transactionapi.repository.LoanRepository;
 import com.example.transactionapi.repository.ScheduleRepository;
 import com.example.transactionapi.repository.user.AccountRepository;
 import com.example.transactionapi.repository.user.TransactionRepository;
 import com.example.transactionapi.repository.UserRepository;
+import com.example.transactionapi.services.utils.CurrencyConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 
 @Service
 public class ActionService {
@@ -25,16 +30,18 @@ public class ActionService {
     private ScheduleRepository scheduleRepository;
     private LoanRepository loanRepository;
     private NotificationService notificationService;
+    private CurrencyConverter currencyConverter;
 
 
     @Autowired
-    public ActionService(TransactionRepository transactionRepository, UserRepository userRepository, AccountRepository accountRepository, ScheduleRepository scheduleRepository, LoanRepository loanRepository, NotificationService notificationService){
+    public ActionService(TransactionRepository transactionRepository, UserRepository userRepository, AccountRepository accountRepository, ScheduleRepository scheduleRepository, LoanRepository loanRepository, NotificationService notificationService,CurrencyConverter currencyConverter){
         this.transactionRepository = transactionRepository;
         this.userRepository = userRepository;
         this.accountRepository = accountRepository;
         this.scheduleRepository = scheduleRepository;
         this.loanRepository = loanRepository;
         this.notificationService = notificationService;
+        this.currencyConverter = currencyConverter;
     }
 
     public void TransactionNotify(Integer id, Status status){
@@ -81,13 +88,40 @@ public class ActionService {
     public boolean TransactionLoan(Integer aid,Integer lid, double balance, int month){
         try {
             Account sender = accountRepository.findById(aid).get();
-            if (sender.getBalance()>=balance){
-                System.out.println(sender.getBalance()+" "+lid+" "+balance+" "+month);
+
+            Rate rate = currencyConverter.getCurrency();
+            Currency currency = loanRepository.findById(lid).get().getCurrency();
+            System.out.println("Curency:"+currency+" balance"+balance);
+            double senderBalance = 0;
+            double receiverBalance = 0;
+            if (sender.getCurrency()==currency){
+                receiverBalance = balance;
+            }else{
+                if (sender.getCurrency() != Currency.USD){
+                    if (sender.getCurrency()==Currency.AMD){
+                        senderBalance = balance/rate.getAmd();
+                    }else {
+                        senderBalance = balance/rate.getEur();
+                    }
+                }else {
+                    senderBalance = balance;
+                }
+                if (currency != Currency.USD){
+                    if (currency==Currency.AMD){
+                        receiverBalance = senderBalance*rate.getAmd();
+                    }else {
+                        receiverBalance = senderBalance*rate.getEur();
+                        System.out.println("ok");
+                    }
+                }else{
+                    receiverBalance = senderBalance;
+                }
+            }
+            if (sender.getBalance()>=receiverBalance){
                 Schedule schedule = scheduleRepository.findByLidAndMonth(lid, month);
-                System.out.println(schedule);
                 sender.setBalance(sender.getBalance()-balance);
-                schedule.setBalance(schedule.getBalance()+balance);
-                if (schedule.getMonthly()<=balance){
+                schedule.setBalance(schedule.getBalance()+receiverBalance);
+                if (schedule.getMonthly()<=receiverBalance){
                     schedule.setStatus(Status.DONE);
                 }
                 accountRepository.save(sender);
@@ -99,18 +133,28 @@ public class ActionService {
         }
         return false;
     }
+
     public float TransactionSave(Integer sid, double bal, Type type){
+        System.out.println(sid+" "+bal+" "+type);
         try {
             Account sender = accountRepository.findById(sid).get();
-            float fee = (float) (bal*0.1>1000 ? bal*0.1 : 1000.0);
+            Currency currency = sender.getCurrency();
+            float fee = 0;
+            if (currency==Currency.AMD){
+                fee = (float) (bal*0.1>1000 ? bal*0.1 : 1000.0);
+            }else if(currency==Currency.EUR){
+                fee = (float) (bal*0.1>1.6 ? bal*0.1 : 1.6);
+            }else {
+                fee = (float) (bal*0.1>2 ? bal*0.1 : 2);
+            }
             int feeball = (int)Math.ceil(fee+bal);
+            System.out.println(fee);
             if (sender!=null){
                 if (type == Type.DEPOSIT){
                     sender.setBalance(sender.getBalance()+bal);
                     accountRepository.save(sender);
                     return 1;
                 }else if(type == Type.WITHDRAWAL){
-                    System.out.println(sender.getBalance()+" "+feeball);
                     if (sender.getBalance()>=feeball){
                         sender.setBalance(sender.getBalance()-feeball);
                         sender.setReserv(sender.getReserv()+feeball);
@@ -133,7 +177,33 @@ public class ActionService {
                     if (transaction.getType()==Type.INTERNAL){
                         Account receiver = accountRepository.findById(transaction.getReceiver()).get();
                         sender.setReserv(sender.getReserv()-transaction.getBalance());
-                        receiver.setBalance(receiver.getBalance()+(transaction.getBalance()+(int)transaction.getFee()));
+                        double senderBalance = 0;
+                        double receiverBalance = 0;
+                        if (sender.getCurrency()==receiver.getCurrency()){
+                            receiverBalance = receiver.getBalance()+transaction.getBalance();
+                        }else{
+                            Rate rate = currencyConverter.getCurrency();
+                            if (sender.getCurrency() != Currency.USD){
+                                if (sender.getCurrency()==Currency.AMD){
+                                    senderBalance = transaction.getBalance()/rate.getAmd();
+                                }else {
+                                    senderBalance = transaction.getBalance()/rate.getEur();
+                                }
+                            }else {
+                                senderBalance = transaction.getBalance();
+                            }
+                            if (receiver.getCurrency() != Currency.USD){
+                                if (receiver.getCurrency()==Currency.AMD){
+                                    receiverBalance = senderBalance*rate.getAmd();
+                                }else {
+                                    receiverBalance = senderBalance*rate.getEur();
+                                }
+                            }else{
+                                receiverBalance = senderBalance;
+                            }
+                        }
+                        System.out.println("Sender"+senderBalance+" receiver"+receiverBalance);
+                        receiver.setBalance(receiver.getBalance()+receiverBalance);
                         accountRepository.save(sender);
                         accountRepository.save(receiver);
                         return true;

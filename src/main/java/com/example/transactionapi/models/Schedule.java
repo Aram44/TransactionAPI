@@ -5,7 +5,6 @@ import com.example.transactionapi.models.utils.LocalDateTimeConverter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -15,6 +14,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 public class Schedule {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @Column(name="loan_id")
     private Integer lid;
@@ -24,16 +26,10 @@ public class Schedule {
     private float monthly;
     private Status status;
 
-    @javax.persistence.Id
-    @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
     public Integer getId() {
         return id;
     }
 
-    @javax.persistence.Id
-    @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
     public void setId(Integer id) {
         this.id = id;
     }

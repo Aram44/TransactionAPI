@@ -21,7 +21,7 @@ public class AccountController{
 
     @GetMapping("/user/{uid}")
     public ResponseEntity<Page<Account>> findByUid(@PathVariable Integer uid, Pageable pageable) {
-        return new ResponseEntity<>(accountRepository.findByUid(uid,pageable), HttpStatus.OK);
+        return new ResponseEntity<>(accountRepository.findByUidOrderByIdDesc(uid,pageable), HttpStatus.OK);
     }
 
     @PostMapping("/create")

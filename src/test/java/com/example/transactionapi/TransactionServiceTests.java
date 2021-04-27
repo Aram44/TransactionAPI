@@ -9,6 +9,7 @@ import com.example.transactionapi.repository.user.AccountRepository;
 import com.example.transactionapi.repository.user.TransactionRepository;
 import com.example.transactionapi.services.ActionService;
 import com.example.transactionapi.services.NotificationService;
+import com.example.transactionapi.services.utils.CurrencyConverter;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,39 +31,41 @@ public class TransactionServiceTests {
     private LoanRepository loanRepository;
     @Autowired
     private NotificationService notificationService;
+    @Autowired
+    private CurrencyConverter currencyConverter;
     @Test
     void SendingMailTest() {
-        ActionService actionService = new ActionService(transactionRepository, userRepository, accountRepository,scheduleRepository,loanRepository,notificationService);
+        ActionService actionService = new ActionService(transactionRepository, userRepository, accountRepository,scheduleRepository,loanRepository,notificationService,currencyConverter);
         Boolean result = actionService.CheckAndSend("xudaverdyan1998@yandex.ru","", Status.DONE,20);
         assertEquals(result, true);
     }
     @Test
     void TransactionLoanTest() {
-        ActionService actionService = new ActionService(transactionRepository, userRepository, accountRepository,scheduleRepository,loanRepository,notificationService);
+        ActionService actionService = new ActionService(transactionRepository, userRepository, accountRepository,scheduleRepository,loanRepository,notificationService,currencyConverter);
         Boolean result = actionService.TransactionLoan(90,17,419,2);
         assertEquals(result, true);
     }
     @Test
     void TransactionSaveTest() {
-        ActionService actionService = new ActionService(transactionRepository, userRepository, accountRepository,scheduleRepository,loanRepository,notificationService);
+        ActionService actionService = new ActionService(transactionRepository, userRepository, accountRepository,scheduleRepository,loanRepository,notificationService,currencyConverter);
         float result = actionService.TransactionSave(90,2000, Type.WITHDRAWAL);
         assertEquals(result, 1000);
     }
     @Test
     void TransactionDepositSaveTest() {
-        ActionService actionService = new ActionService(transactionRepository, userRepository, accountRepository,scheduleRepository,loanRepository,notificationService);
+        ActionService actionService = new ActionService(transactionRepository, userRepository, accountRepository,scheduleRepository,loanRepository,notificationService,currencyConverter);
         float result = actionService.TransactionSave(91,2000, Type.DEPOSIT);
         assertEquals(result, 1);
     }
     @Test
     void TransactionTest() {
-        ActionService actionService = new ActionService(transactionRepository, userRepository, accountRepository,scheduleRepository,loanRepository,notificationService);
+        ActionService actionService = new ActionService(transactionRepository, userRepository, accountRepository,scheduleRepository,loanRepository,notificationService,currencyConverter);
         Boolean result = actionService.Transaction(109, Status.DONE);
         assertEquals(result, true);
     }
     @Test
     void TransactionInternalTest() {
-        ActionService actionService = new ActionService(transactionRepository, userRepository, accountRepository,scheduleRepository,loanRepository,notificationService);
+        ActionService actionService = new ActionService(transactionRepository, userRepository, accountRepository,scheduleRepository,loanRepository,notificationService,currencyConverter);
         Boolean result = actionService.TransactionInternalSave(90,91,1000);
         assertEquals(result, true);
     }

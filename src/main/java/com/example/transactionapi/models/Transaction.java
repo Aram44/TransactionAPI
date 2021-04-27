@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.data.annotation.Id;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -17,12 +16,15 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 public class Transaction {
-    @javax.persistence.Id
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Integer id;
     private Integer sender;
     private Integer receiver;
+    @Column(name="sender_id")
+    private Integer sid;
+    @Column(name="receiver_id")
+    private Integer rid;
     private double balance;
     private float fee;
     private int month;
@@ -52,6 +54,26 @@ public class Transaction {
 
     public void setReceiver(Integer receiver) {
         this.receiver = receiver;
+    }
+
+    @Column(name="sender_id")
+    public Integer getSid() {
+        return sid;
+    }
+
+    @Column(name="sender_id")
+    public void setSid(Integer sid) {
+        this.sid = sid;
+    }
+
+    @Column(name="receiver_id")
+    public Integer getRid() {
+        return rid;
+    }
+
+    @Column(name="receiver_id")
+    public void setRid(Integer rid) {
+        this.rid = rid;
     }
 
     public double getBalance() {

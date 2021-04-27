@@ -1,11 +1,11 @@
 package com.example.transactionapi.models;
 
+import com.example.transactionapi.models.enums.Currency;
 import com.example.transactionapi.models.enums.Status;
 import com.example.transactionapi.models.utils.LocalDateTimeConverter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Entity
 public class Loan {
-    @javax.persistence.Id
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Integer id;
@@ -27,6 +26,7 @@ public class Loan {
     private float monthly;
     private int months;
     private float percent;
+    private Currency currency;
     private Status status;
     @Convert(converter = LocalDateTimeConverter.class)
     private LocalDateTime requesttime;
@@ -97,6 +97,14 @@ public class Loan {
 
     public void setPercent(float percent) {
         this.percent = percent;
+    }
+
+    public Currency getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(Currency currency) {
+        this.currency = currency;
     }
 
     public Status getStatus() {

@@ -4,19 +4,14 @@ import com.example.transactionapi.models.enums.Currency;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
+import javax.persistence.*;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 public class Account {
-    @javax.persistence.Id
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Integer id;
@@ -34,8 +29,15 @@ public class Account {
         this.id = id;
     }
 
+    @Column(name="user_id")
     public Integer getUid() {
         return uid;
+    }
+
+
+    @Column(name="user_id")
+    public void setUid(Integer uid) {
+        this.uid = uid;
     }
 
     public Currency getCurrency() {
@@ -45,11 +47,6 @@ public class Account {
     public void setCurrency(Currency currency) {
         this.currency = currency;
     }
-
-    public void setUid(Integer uid) {
-        this.uid = uid;
-    }
-
     public double getBalance() {
         return balance;
     }

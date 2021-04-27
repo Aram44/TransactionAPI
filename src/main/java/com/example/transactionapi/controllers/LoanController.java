@@ -7,6 +7,7 @@ import com.example.transactionapi.models.Transaction;
 import com.example.transactionapi.repository.LoanRepository;
 import com.example.transactionapi.repository.ScheduleRepository;
 import com.example.transactionapi.services.LoanService;
+import com.example.transactionapi.services.NotificationService;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.slf4j.Logger;
@@ -20,6 +21,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/loan")
@@ -27,21 +31,38 @@ import java.time.LocalDateTime;
 public class LoanController {
 
     private Logger logger = LoggerFactory.getLogger(UserController.class);
-    @Autowired
     private LoanRepository loanRepository;
-    @Autowired
     private ScheduleRepository scheduleRepository;
-    @Autowired
     private LoanService loanService;
+    private NotificationService notificationService;
+
+    @Autowired
+    LoanController(LoanRepository loanRepository, ScheduleRepository scheduleRepository, LoanService loanService, NotificationService notificationService){
+        this.loanRepository = loanRepository;
+        this.scheduleRepository = scheduleRepository;
+        this.loanService = loanService;
+        this.notificationService = notificationService;
+    }
 
     @GetMapping("/allloans")
-    public ResponseEntity<Page<Loan>> findAll(@RequestParam(defaultValue = "none") String start, @RequestParam(defaultValue = "none") String end, @RequestParam(defaultValue = "4") int status, @RequestParam(defaultValue = "none") String uid, @PageableDefault(page = 0, size = 20) Pageable pageable) {
+    public ResponseEntity<Page<Loan>> findAll(@RequestParam(defaultValue = "none") String start, @RequestParam(defaultValue = "none") String end, @RequestParam(defaultValue = "5") int status, @RequestParam(defaultValue = "none") String uid, @PageableDefault(page = 0, size = 20) Pageable pageable) {
         return loanService.ShowLaoads(start,end,status,uid,pageable);
     }
 
     @GetMapping("/view/{id}")
     public ResponseEntity<Page<Schedule>> findByID(@PathVariable Integer id, @PageableDefault(page = 0, size = 20) Pageable pageable) {
         return new ResponseEntity<>(scheduleRepository.findAllByLid(id,pageable), HttpStatus.OK);
+    }
+    @GetMapping("/viewinfo/{id}")
+    public ResponseEntity<Map<String,String>> findInfoByID(@PathVariable Integer id) {
+        Map<String,String> result = new HashMap<>();
+        float balance = 0;
+        List<Schedule> allschedules = scheduleRepository.findAllByLid(id);
+        for(Schedule schedule : allschedules){
+            balance+= schedule.getBalance();
+        }
+        result.put("balance", String.valueOf(balance));
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
     @GetMapping("/viewloan/{id}")
     public ResponseEntity<Loan> findAllByID(@PathVariable Integer id) {
@@ -77,25 +98,21 @@ public class LoanController {
     }
 
     @GetMapping("/loan/{uid}")
-    public ResponseEntity<Page<Loan>> findByUID(@RequestParam(defaultValue = "none") String start, @RequestParam(defaultValue = "none") String end, @RequestParam(defaultValue = "4") int status, @PathVariable String uid, @PageableDefault(page = 0, size = 20) Pageable pageable) {
+    public ResponseEntity<Page<Loan>> findByUID(@RequestParam(defaultValue = "none") String start, @RequestParam(defaultValue = "none") String end, @RequestParam(defaultValue = "5") int status, @PathVariable String uid, @PageableDefault(page = 0, size = 20) Pageable pageable) {
         return loanService.ShowLaoads(start,end,status,uid,pageable);
     }
 
     @PostMapping("/loan")
     public ResponseEntity<String> save(@RequestBody Loan loan) {
-        System.out.println(loan.getUid());
         JSONObject jsonObject = new JSONObject();
         try {
-            loan.setRequesttime(LocalDateTime.now());
-            loan.setChangetime(LocalDateTime.now());
-            loanRepository.save(loan);
-            jsonObject.put("message", "Loan Saved");
+            loanService.loanSaveorChange(loan);
+            jsonObject.put("message","Loan saved successfuly!");
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return new ResponseEntity<>(jsonObject.toString(), HttpStatus.CREATED);
     }
-
 
     @DeleteMapping("/loan/{id}")
     public ResponseEntity<String> deleteById(@PathVariable Integer id){
@@ -110,8 +127,7 @@ public class LoanController {
     }
     @GetMapping("/filter")
     @ResponseBody
-    public ResponseEntity<Page<Transaction>> withFilter(@RequestParam(defaultValue = "none") String start, @RequestParam(defaultValue = "none") String finish, @RequestParam(defaultValue = "4") int status, @RequestParam(defaultValue = "none") String uid, @PageableDefault(page = 0, size = 20) Pageable pageable) {
-//        return transactionService.ShowTransactions(start,finish,status,uid,pageable);
-        return null;
+    public ResponseEntity<Page<Loan>> withFilter(@RequestParam(defaultValue = "none") String start, @RequestParam(defaultValue = "none") String finish, @RequestParam(defaultValue = "5") int status, @RequestParam(defaultValue = "none") String uid, @PageableDefault(page = 0, size = 20) Pageable pageable) {
+        return loanService.ShowLaoads(start,finish,status,uid,pageable);
     }
 }

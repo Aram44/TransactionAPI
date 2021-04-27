@@ -8,6 +8,10 @@ import com.example.transactionapi.models.enums.Type;
 import com.example.transactionapi.repository.user.AccountRepository;
 import com.example.transactionapi.repository.user.TransactionRepository;
 import com.example.transactionapi.repository.UserRepository;
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Disjunction;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,13 +40,19 @@ public class TransactionService {
     @Autowired
     private UserRepository userRepository;
 
+//    @Autowired
+//    private EntityManager entityManager;
+
     public ResponseEntity<Page<Transaction>> ShowTransactions(String start, String end, int status, String uid, Pageable pageable){
+        System.out.println(start+" "+end+" "+status+" "+uid);
+//        Session session = (Session) entityManager;
+//        session.createCriteria(Transaction.class).list();
         if (!start.equals("none") || !end.equals("none")){
             LocalDateTime dateStart = LocalDateTime.parse(start+":00");
             LocalDateTime dateFinish = LocalDateTime.parse(end+":00");
             if(uid.equals("none")){
                 if (status==4){
-                    return new ResponseEntity<>(transactionRepository.findAllBySendtimeBetween(dateStart,dateFinish,pageable), HttpStatus.OK);
+                    return new ResponseEntity<>(transactionRepository.findAllBySendtimeBetweenOrderByIdDesc(dateStart,dateFinish,pageable), HttpStatus.OK);
                 }else {
                     Status state;
                     if (status==0){
@@ -54,19 +64,27 @@ public class TransactionService {
                     }else{
                         state = Status.CANCELED;
                     }
-                    return new ResponseEntity<>(transactionRepository.findAllByStatusAndSendtimeBetween(state, dateStart, dateFinish, pageable), HttpStatus.OK);
+                    return new ResponseEntity<>(transactionRepository.findAllByStatusAndSendtimeBetweenOrderByIdDesc(state, dateStart, dateFinish, pageable), HttpStatus.OK);
                 }
             }else {
-                List<Account> accountList = accountRepository.findAllByUId(Integer.valueOf(uid));
-                List<Transaction> listTransaction = new ArrayList<>();
-                for (Account accountItem : accountList) {
-                    List<Transaction> list = transactionRepository.findAllBySenderOrReceiverAndSendtimeBetween(accountItem.getId(), accountItem.getId(), dateStart, dateFinish);
-                    listTransaction.addAll(list);
+                if (status==5){
+                    return new ResponseEntity<>(transactionRepository.findAllBySidAndSendtimeBetweenOrderByIdDesc(Integer.valueOf(uid), dateStart, dateFinish ,pageable), HttpStatus.OK);
+                }else {
+                    Status state;
+                    if (status==0){
+                        state = Status.PROCESS;
+                    }else if(status==1){
+                        state = Status.DONE;
+                    }else if (status==2){
+                        state = Status.REFUSED;
+                    }else{
+                        state = Status.CANCELED;
+                    }
+                    return new ResponseEntity<>(transactionRepository.findAllByStatusAndSidAndSendtimeBetweenOrderByIdDesc(state,Integer.valueOf(uid), dateStart, dateFinish,pageable), HttpStatus.OK);
+
                 }
-                Page<Transaction> page = new PageImpl<>(listTransaction);
-                return new ResponseEntity<>(page, HttpStatus.OK);
             }
-        }else if(status!=4){
+        }else if(status!=5){
             Status state;
             if (status==0){
                 state = Status.PROCESS;
@@ -77,7 +95,13 @@ public class TransactionService {
             }else{
                 state = Status.CANCELED;
             }
-            return new ResponseEntity<>(transactionRepository.findAllByStatus(state,pageable), HttpStatus.OK);
+            if (uid.equals("none")){
+                return new ResponseEntity<>(transactionRepository.findAllByStatusOrderByIdDesc(state,pageable), HttpStatus.OK);
+            }else {
+                System.out.println("ok");
+                return new ResponseEntity<>(transactionRepository.findAllByStatusAndSidOrderByIdDesc(state,Integer.valueOf(uid),pageable), HttpStatus.OK);
+            }
+
         }
         return new ResponseEntity<>(transactionRepository.findAll(pageable), HttpStatus.OK);
     }
@@ -89,10 +113,11 @@ public class TransactionService {
             if (transaction.getType() == Type.WITHDRAWAL || transaction.getType() == Type.DEPOSIT) {
                 Account senderAccount = accountRepository.findById(transaction.getSender()).get();
                 User sender = userRepository.findById(senderAccount.getUid()).get();
+                result.put("type", String.valueOf(transaction.getType()));
                 result.put("sender", String.valueOf(transaction.getSender()));
                 result.put("senderName", sender.getName());
                 result.put("senderEmail", sender.getEmail());
-                result.put("balance", String.valueOf(transaction.getBalance()));
+                result.put("balance", String.valueOf(transaction.getBalance())+" "+senderAccount.getCurrency());
                 result.put("fee", String.valueOf(transaction.getFee()));
                 result.put("status", String.valueOf(transaction.getStatus()));
                 result.put("sendtime", String.valueOf(transaction.getSendtime()));
@@ -103,13 +128,14 @@ public class TransactionService {
                 Account receiverAccount = accountRepository.findById(transaction.getSender()).get();
                 User sender = userRepository.findById(senderAccount.getUid()).get();
                 User receiver = userRepository.findById(receiverAccount.getUid()).get();
+                result.put("type", String.valueOf(transaction.getType()));
                 result.put("sender", String.valueOf(transaction.getSender()));
                 result.put("receiver", String.valueOf(transaction.getReceiver()));
                 result.put("senderName", sender.getName());
                 result.put("receiverName", receiver.getName());
                 result.put("senderEmail", sender.getEmail());
                 result.put("receiverEmail", receiver.getEmail());
-                result.put("balance", String.valueOf(transaction.getBalance()));
+                result.put("balance", String.valueOf(transaction.getBalance())+" "+senderAccount.getCurrency());
                 result.put("fee", String.valueOf(transaction.getFee()));
                 result.put("status", String.valueOf(transaction.getStatus()));
                 result.put("sendtime", String.valueOf(transaction.getSendtime()));

@@ -3,7 +3,6 @@ package com.example.transactionapi.models;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -14,7 +13,6 @@ import javax.validation.constraints.Size;
 @NoArgsConstructor
 @Entity
 public class User {
-    @javax.persistence.Id
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Integer id;

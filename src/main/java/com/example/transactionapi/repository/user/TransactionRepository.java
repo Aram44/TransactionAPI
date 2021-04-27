@@ -9,15 +9,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Integer> {
-    List<Transaction> findAllBySenderOrReceiver(Integer sender, Integer receiver);
-    Page<Transaction> findAllBySendtimeBetween(LocalDateTime sendTimeStart, LocalDateTime sendTimeEnd,Pageable pageable);
-    Page<Transaction> findAllByStatusAndSendtimeBetween(Status status, LocalDateTime sendTimeStart, LocalDateTime sendTimeEnd, Pageable pageable);
-    Page<Transaction> findAllByStatus(Status status, Pageable pageable);
-    List<Transaction> findAllBySenderOrReceiverAndSendtimeBetween(Integer sender, Integer receiver,LocalDateTime sendTimeStart, LocalDateTime sendTimeEnd);
-
+    Page<Transaction> findAllByOrderByIdDesc(Pageable pageable);
+    Page<Transaction> findAllBySendtimeBetweenOrderByIdDesc(LocalDateTime sendTimeStart, LocalDateTime sendTimeEnd,Pageable pageable);
+    Page<Transaction> findAllByStatusAndSendtimeBetweenOrderByIdDesc(Status status, LocalDateTime sendTimeStart, LocalDateTime sendTimeEnd, Pageable pageable);
+    Page<Transaction> findAllByStatusOrderByIdDesc(Status status, Pageable pageable);
+    Page<Transaction> findBySidOrRidOrderByIdDesc(Integer sid, Integer rid, Pageable pageable);
+    Page<Transaction> findAllByStatusAndSidOrderByIdDesc(Status state,Integer sid,Pageable pageable);
+    Page<Transaction> findAllByStatusAndSidAndSendtimeBetweenOrderByIdDesc(Status state, Integer sid, LocalDateTime dateStart, LocalDateTime dateFinish,Pageable pageable);
+    Page<Transaction> findAllBySidAndSendtimeBetweenOrderByIdDesc(Integer sid, LocalDateTime dateStart, LocalDateTime dateFinish, Pageable pageable);
 }

@@ -16,5 +16,5 @@ public interface AccountRepository extends PagingAndSortingRepository<Account, I
     @Query("FROM Account WHERE uid=:uid")
     List<Account> findAllByUId(@Param("uid") Integer uid);
 
-    Page<Account> findByUid(Integer uid, Pageable pageable);
+    Page<Account> findByUidOrderByIdDesc(Integer uid, Pageable pageable);
 }
