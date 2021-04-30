@@ -8,6 +8,8 @@ import com.example.transactionapi.models.enums.Type;
 import com.example.transactionapi.repository.user.AccountRepository;
 import com.example.transactionapi.repository.user.TransactionRepository;
 import com.example.transactionapi.repository.UserRepository;
+import com.example.transactionapi.repository.utils.RateRepository;
+import com.example.transactionapi.services.utils.CurrencyConverter;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Disjunction;
@@ -39,6 +41,8 @@ public class TransactionService {
     private AccountRepository accountRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private CurrencyConverter currencyConverter;
 
 //    @Autowired
 //    private EntityManager entityManager;
@@ -117,7 +121,7 @@ public class TransactionService {
                 result.put("sender", String.valueOf(transaction.getSender()));
                 result.put("senderName", sender.getName());
                 result.put("senderEmail", sender.getEmail());
-                result.put("balance", String.valueOf(transaction.getBalance())+" "+senderAccount.getCurrency());
+                result.put("balanceSender", String.valueOf(transaction.getBalance())+" "+senderAccount.getCurrency());
                 result.put("fee", String.valueOf(transaction.getFee()));
                 result.put("status", String.valueOf(transaction.getStatus()));
                 result.put("sendtime", String.valueOf(transaction.getSendtime()));
@@ -125,9 +129,10 @@ public class TransactionService {
                 return new ResponseEntity<>(result, HttpStatus.OK);
             } else {
                 Account senderAccount = accountRepository.findById(transaction.getSender()).get();
-                Account receiverAccount = accountRepository.findById(transaction.getSender()).get();
+                Account receiverAccount = accountRepository.findById(transaction.getReceiver()).get();
                 User sender = userRepository.findById(senderAccount.getUid()).get();
                 User receiver = userRepository.findById(receiverAccount.getUid()).get();
+                double receiverBalance = currencyConverter.convertByValue(senderAccount.getCurrency(),receiverAccount.getCurrency(),transaction.getBalance(),transaction.getSendtime());
                 result.put("type", String.valueOf(transaction.getType()));
                 result.put("sender", String.valueOf(transaction.getSender()));
                 result.put("receiver", String.valueOf(transaction.getReceiver()));
@@ -135,7 +140,8 @@ public class TransactionService {
                 result.put("receiverName", receiver.getName());
                 result.put("senderEmail", sender.getEmail());
                 result.put("receiverEmail", receiver.getEmail());
-                result.put("balance", String.valueOf(transaction.getBalance())+" "+senderAccount.getCurrency());
+                result.put("balanceSender", String.format("%1.2f", transaction.getBalance())+" "+senderAccount.getCurrency());
+                result.put("balanceReceiver", String.format("%1.2f", receiverBalance)+" "+receiverAccount.getCurrency());
                 result.put("fee", String.valueOf(transaction.getFee()));
                 result.put("status", String.valueOf(transaction.getStatus()));
                 result.put("sendtime", String.valueOf(transaction.getSendtime()));

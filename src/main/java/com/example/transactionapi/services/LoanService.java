@@ -90,11 +90,11 @@ public class LoanService {
         loanRepository.save(loan);
         String userEmail = userRepository.findById(loan.getUid()).get().getEmail();
         if (loan.getId()!=null){
+            message = "Your loan "+loan.getName()+" by id: "+loan.getId()+" amount: "+loan.getAmount()+" "+loan.getCurrency()+" interest: "+loan.getInterest()+" "+loan.getCurrency()+" edited by admin";
+            notificationService.SendNotification(userEmail, message);
+        }else{
             message = "New Loan creted by user id: "+loan.getUid();
             notificationService.SendNotification("xudaverdyan@outlook.com", message);
-        }else{
-            message = "Your loan by id: "+loan.getId()+" edited by admin";
-            notificationService.SendNotification(userEmail, message);
         }
         return true;
     }

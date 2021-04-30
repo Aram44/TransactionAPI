@@ -53,6 +53,7 @@ public class LoanController {
     public ResponseEntity<Page<Schedule>> findByID(@PathVariable Integer id, @PageableDefault(page = 0, size = 20) Pageable pageable) {
         return new ResponseEntity<>(scheduleRepository.findAllByLid(id,pageable), HttpStatus.OK);
     }
+
     @GetMapping("/viewinfo/{id}")
     public ResponseEntity<Map<String,String>> findInfoByID(@PathVariable Integer id) {
         Map<String,String> result = new HashMap<>();
@@ -125,9 +126,15 @@ public class LoanController {
         }
         return new ResponseEntity<>(jsonObject.toString(), HttpStatus.OK);
     }
+
     @GetMapping("/filter")
     @ResponseBody
     public ResponseEntity<Page<Loan>> withFilter(@RequestParam(defaultValue = "none") String start, @RequestParam(defaultValue = "none") String finish, @RequestParam(defaultValue = "5") int status, @RequestParam(defaultValue = "none") String uid, @PageableDefault(page = 0, size = 20) Pageable pageable) {
         return loanService.ShowLaoads(start,finish,status,uid,pageable);
+    }
+
+    @GetMapping("/report")
+    public ResponseEntity<List<Object[]>> balanceInfo(){
+        return new ResponseEntity<>(loanRepository.statusGroup(), HttpStatus.OK);
     }
 }

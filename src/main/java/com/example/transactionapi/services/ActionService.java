@@ -18,7 +18,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class ActionService {
@@ -64,23 +65,24 @@ public class ActionService {
         }
     }
     public boolean CheckAndSend(String senderEmail, String receiverEmail,Status status,Integer id){
+        Transaction transaction = transactionRepository.findById(id).get();
         if (status == Status.DONE){
             if (receiverEmail.equals("")){
-                notificationService.SendNotification(receiverEmail,"Transaction "+id+" Applyed!");
+                notificationService.SendNotification(receiverEmail,"Your Transaction by id "+id+" with "+transaction.getBalance()+" balance Applyed!");
             }
-            notificationService.SendNotification(senderEmail,"Transaction "+id+" Applyed!");
+            notificationService.SendNotification(senderEmail,"Your Transaction by id "+id+" with "+transaction.getBalance()+" balance Applyed!");
             return true;
         }else if (status == Status.REFUSED){
             if (receiverEmail.equals("")){
-                notificationService.SendNotification(receiverEmail,"Transaction "+id+" Refused!");
+                notificationService.SendNotification(receiverEmail,"Your Transaction by id "+id+" with "+transaction.getBalance()+" balance Refused!");
             }
-            notificationService.SendNotification(senderEmail,"Transaction "+id+" Refused!");
+            notificationService.SendNotification(senderEmail,"Your Transaction by id "+id+" with "+transaction.getBalance()+" balance Refused!");
             return true;
         }else{
             if (receiverEmail.equals("")){
-                notificationService.SendNotification(receiverEmail,"Transaction "+id+" Canceled!");
+                notificationService.SendNotification(receiverEmail,"Your Transaction by id "+id+" with "+transaction.getBalance()+" balance Canceled!");
             }
-            notificationService.SendNotification(senderEmail,"Transaction "+id+" Canceled!");
+            notificationService.SendNotification(senderEmail,"Your Transaction by id "+id+" with "+transaction.getBalance()+" balance Canceled!");
             return true;
         }
     }
@@ -246,5 +248,15 @@ public class ActionService {
             logger.error(e.getMessage());
         }
         return false;
+    }
+    public void NotifyAllAboutPayment(){
+        List<Schedule> listSchedule = scheduleRepository.findAllByPaymantdateBetweenAndStatusNotOrderById(LocalDateTime.now(),LocalDateTime.now().plusDays(3), Status.DONE);
+        for(Schedule schedule: listSchedule){
+            Loan loan = loanRepository.findById(schedule.getLid()).get();
+            User user = userRepository.findById(loan.getUid()).get();
+            double balance = schedule.getMonthly()-schedule.getBalance();
+            String message = "Your Loan by id: "+loan.getId()+" has payment for "+schedule.getPaymantdate()+" "+String.format("%1.2f", balance)+" "+loan.getCurrency()+" Please pay before that time";
+            notificationService.SendNotification(user.getEmail(),message);
+        }
     }
 }

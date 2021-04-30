@@ -1,10 +1,8 @@
 package com.example.transactionapi.controllers;
 
-import com.example.transactionapi.models.utils.Account;
 import com.example.transactionapi.models.enums.Status;
 import com.example.transactionapi.models.Transaction;
 import com.example.transactionapi.models.enums.Type;
-import com.example.transactionapi.models.utils.Rate;
 import com.example.transactionapi.repository.user.AccountRepository;
 import com.example.transactionapi.repository.user.TransactionRepository;
 import com.example.transactionapi.services.ActionService;
@@ -15,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -24,8 +21,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 @RestController

@@ -1,4 +1,4 @@
-package com.example.transactionapi.controllers;
+package com.example.transactionapi.controllers.auth;
 
 import com.example.transactionapi.config.JwtTokenProvider;
 import com.example.transactionapi.models.utils.AuthRequest;

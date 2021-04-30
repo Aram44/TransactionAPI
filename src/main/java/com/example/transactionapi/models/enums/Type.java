@@ -5,5 +5,6 @@ public enum Type {
     DEPOSIT,
     WITHDRAWAL,
     INTERNAL,
-    LOAN
+    LOAN,
+    EXCHANGE
 }

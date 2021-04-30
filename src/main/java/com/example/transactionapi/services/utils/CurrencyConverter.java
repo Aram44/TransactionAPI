@@ -1,5 +1,6 @@
 package com.example.transactionapi.services.utils;
 
+import com.example.transactionapi.models.enums.Currency;
 import com.example.transactionapi.models.utils.Rate;
 import com.example.transactionapi.repository.utils.RateRepository;
 import com.google.gson.JsonElement;
@@ -16,9 +17,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 public class CurrencyConverter {
@@ -65,5 +63,39 @@ public class CurrencyConverter {
             }
         }
         return rate;
+    }
+    public double convertByValue(Currency from, Currency to, Double balance, LocalDateTime time){
+        Rate rate = rateRepository.findTopByOrderByIdDesc();
+        if (time!=null){
+            rate = rateRepository.findByUpdatedtime(time);
+            if (rate==null){
+                rate = rateRepository.findTopByOrderByIdDesc();
+            }
+        }
+        double senderBalance = 0;
+        double receiverBalance = 0;
+        if (from==to){
+            receiverBalance = balance;
+        }else{
+            if (from != Currency.USD){
+                if (from== com.example.transactionapi.models.enums.Currency.AMD){
+                    senderBalance = balance/rate.getAmd();
+                }else {
+                    senderBalance = balance/rate.getEur();
+                }
+            }else {
+                senderBalance = balance;
+            }
+            if (to != com.example.transactionapi.models.enums.Currency.USD){
+                if (to== com.example.transactionapi.models.enums.Currency.AMD){
+                    receiverBalance = senderBalance*rate.getAmd();
+                }else {
+                    receiverBalance = senderBalance*rate.getEur();
+                }
+            }else{
+                receiverBalance = senderBalance;
+            }
+        }
+        return receiverBalance;
     }
 }
