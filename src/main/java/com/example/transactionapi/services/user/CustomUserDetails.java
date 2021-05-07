@@ -1,27 +1,35 @@
 package com.example.transactionapi.services.user;
 
-import com.example.transactionapi.models.User;
-import com.example.transactionapi.repository.UserRepository;
+import com.example.transactionapi.exceptions.UserException;
+import com.example.transactionapi.model.user.User;
+import com.example.transactionapi.repository.user.UserRepository;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.Locale;
 
 
 @Service
 public class CustomUserDetails {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final MessageSource messageSource;
+
+    CustomUserDetails(UserRepository userRepository, MessageSource messageSource){
+        this.userRepository = userRepository;
+        this.messageSource = messageSource;
+    }
 
     public Page<User> findAll(Pageable pageable) {
         return userRepository.findAll(pageable);
     }
 
-    public User findById(Integer id) {
-        return userRepository.findById(id).get();
+    public User findById(long id) {
+        return userRepository.findById(id).orElseThrow(() -> {throw new UserException(messageSource.getMessage("user.not.found", new Object[]{id}, Locale.ENGLISH));});
     }
 
     public User findByEmail(String email) {
@@ -32,7 +40,7 @@ public class CustomUserDetails {
         return userRepository.save(user);
     }
 
-    public String deleteById(Integer id) {
+    public String deleteById(long id) {
         JSONObject jsonObject = new JSONObject();
         try {
             userRepository.deleteById(id);

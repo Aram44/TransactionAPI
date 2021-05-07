@@ -1,47 +1,55 @@
-package com.example.transactionapi.models;
+package com.example.transactionapi.model.schedule;
 
-import com.example.transactionapi.models.enums.Status;
-import com.example.transactionapi.models.utils.LocalDateTimeConverter;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.example.transactionapi.model.loan.Status;
+import com.example.transactionapi.model.utils.LocalDateTimeConverter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
 public class Schedule {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-    @Column(name="loan_id")
-    private Integer lid;
+    private long id;
+    private long lid;
     private double balance;
     private int month;
+    private float penalty;
     private LocalDateTime paymantdate;
     private float monthly;
     private Status status;
 
-    public Integer getId() {
+    public Schedule() {
+
+    }
+    public Schedule(long lid, double balance, int month, float penalty, LocalDateTime paymantdate, float monthly, Status status) {
+        this.lid = lid;
+        this.balance = balance;
+        this.month = month;
+        this.penalty = penalty;
+        this.paymantdate = paymantdate;
+        this.monthly = monthly;
+        this.status = status;
+    }
+
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    public long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(long id) {
         this.id = id;
     }
 
     @Column(name="loan_id")
-    public Integer getLid() {
-        return lid;
+    public void setLid(long lid) {
+        this.lid = lid;
     }
 
     @Column(name="loan_id")
-    public void setLid(Integer lid) {
-        this.lid = lid;
+    public long getLid() {
+        return lid;
     }
 
     public double getBalance() {
@@ -68,6 +76,14 @@ public class Schedule {
         this.month = month;
     }
 
+    public float getPenalty() {
+        return penalty;
+    }
+
+    public void setPenalty(float penalty) {
+        this.penalty = penalty;
+    }
+
     @Convert(converter = LocalDateTimeConverter.class)
     public LocalDateTime getPaymantdate() {
         return paymantdate;
@@ -78,6 +94,7 @@ public class Schedule {
         this.paymantdate = paymantdate;
     }
 
+    @Enumerated(EnumType.STRING)
     public Status getStatus() {
         return status;
     }
@@ -85,4 +102,6 @@ public class Schedule {
     public void setStatus(Status status) {
         this.status = status;
     }
+
+
 }

@@ -1,4 +1,4 @@
-package com.example.transactionapi.models.utils;
+package com.example.transactionapi.model.utils;
 
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -7,7 +7,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 public class Rate {

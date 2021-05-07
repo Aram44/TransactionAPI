@@ -1,38 +1,32 @@
-package com.example.transactionapi.models;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+package com.example.transactionapi.model.user;
 
 import javax.persistence.*;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.Size;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Entity
+@Entity(name="user")
 public class User {
-    @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
-    private Integer id;
-    @Column(unique = true)
-    @Email
+    private long id;
     private String email;
-    @Size(min = 8, max = 20, message = "Password should be between 2 to 20")
     private String password;
     private String name;
-
-    @ManyToOne
-    @JoinColumn(name = "role_id")
     private Role role;
 
+    public User() {
+    }
 
-    public Integer getId() {
+    public User(String email, String password, String name, Role role) {
+        this.email = email;
+        this.password = password;
+        this.name = name;
+        this.role = role;
+    }
+
+    @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    public long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -60,6 +54,8 @@ public class User {
         this.name = name;
     }
 
+    @ManyToOne
+    @JoinColumn(name = "role_id")
     public Role getRole() {
         return role;
     }

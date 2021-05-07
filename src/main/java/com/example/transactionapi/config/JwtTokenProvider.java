@@ -1,6 +1,6 @@
 package com.example.transactionapi.config;
 
-import com.example.transactionapi.models.Role;
+import com.example.transactionapi.model.user.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

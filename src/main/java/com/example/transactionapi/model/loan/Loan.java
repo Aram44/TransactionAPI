@@ -1,25 +1,16 @@
-package com.example.transactionapi.models;
+package com.example.transactionapi.model.loan;
 
-import com.example.transactionapi.models.enums.Currency;
-import com.example.transactionapi.models.enums.Status;
-import com.example.transactionapi.models.utils.LocalDateTimeConverter;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.example.transactionapi.model.utils.Currency;
+import com.example.transactionapi.model.user.User;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 @Entity
+@Table(name = "loan")
 public class Loan {
-    @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
-    private Integer id;
-    @Column(name="user_id")
-    private Integer uid;
+    private long id;
+    private User user;
     private float amount;
     private String name;
     private float interest;
@@ -28,27 +19,44 @@ public class Loan {
     private float percent;
     private Currency currency;
     private Status status;
-    @Convert(converter = LocalDateTimeConverter.class)
-    private LocalDateTime requesttime;
-    @Convert(converter = LocalDateTimeConverter.class)
-    private LocalDateTime changetime;
+    private Timestamp requesttime;
+    private Timestamp changetime;
 
-    public Integer getId() {
+    public Loan() {
+    }
+
+    public Loan(User user, float amount, String name, float interest, float monthly, int months, float percent, Currency currency, Status status, Timestamp requesttime, Timestamp changetime) {
+        this.user = user;
+        this.amount = amount;
+        this.name = name;
+        this.interest = interest;
+        this.monthly = monthly;
+        this.months = months;
+        this.percent = percent;
+        this.currency = currency;
+        this.status = status;
+        this.requesttime = requesttime;
+        this.changetime = changetime;
+    }
+
+    @Id
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    public long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(long id) {
         this.id = id;
     }
 
-    @Column(name="user_id")
-    public Integer getUid() {
-        return uid;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    public User getUser() {
+        return user;
     }
 
-    @Column(name="user_id")
-    public void setUid(Integer uid) {
-        this.uid = uid;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public float getAmount() {
@@ -115,19 +123,19 @@ public class Loan {
         this.status = status;
     }
 
-    public LocalDateTime getRequesttime() {
+    public Timestamp getRequesttime() {
         return requesttime;
     }
 
-    public void setRequesttime(LocalDateTime requesttime) {
+    public void setRequesttime(Timestamp requesttime) {
         this.requesttime = requesttime;
     }
 
-    public LocalDateTime getChangetime() {
+    public Timestamp getChangetime() {
         return changetime;
     }
 
-    public void setChangetime(LocalDateTime changetime) {
+    public void setChangetime(Timestamp changetime) {
         this.changetime = changetime;
     }
 }

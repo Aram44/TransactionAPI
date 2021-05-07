@@ -1,15 +1,13 @@
-package com.example.transactionapi.models.utils;
+package com.example.transactionapi.model.utils;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class AuthRequest {
     private String email;
     private String password;
+
+    public AuthRequest(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
 
     public String getEmail() {
         return email;

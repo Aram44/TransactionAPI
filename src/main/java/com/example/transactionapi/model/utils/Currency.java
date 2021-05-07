@@ -1,4 +1,4 @@
-package com.example.transactionapi.models.enums;
+package com.example.transactionapi.model.utils;
 
 public enum Currency {
     USD,

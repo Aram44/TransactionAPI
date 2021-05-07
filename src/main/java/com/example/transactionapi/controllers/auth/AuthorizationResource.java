@@ -1,9 +1,9 @@
 package com.example.transactionapi.controllers.auth;
 
 import com.example.transactionapi.config.JwtTokenProvider;
-import com.example.transactionapi.models.utils.AuthRequest;
-import com.example.transactionapi.models.User;
-import com.example.transactionapi.repository.UserRepository;
+import com.example.transactionapi.model.utils.AuthRequest;
+import com.example.transactionapi.model.user.User;
+import com.example.transactionapi.repository.user.UserRepository;
 import org.codehaus.jettison.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,7 +22,7 @@ public class AuthorizationResource {
     @Autowired
     private UserRepository userRepository;
 
-    @GetMapping("/")
+    @GetMapping
     public String welcome() {
         return "Welcome!";
     }
@@ -45,17 +45,17 @@ public class AuthorizationResource {
         return jsonObject.toString();
     }
 
-    @PostMapping("/change")
-    public String generateToken(@RequestBody User user) throws Exception {
-        User chnage = userRepository.findById(user.getId()).get();
-        if (chnage==null){
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("message", "User not found");
-            return jsonObject.toString();
-        }else{
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("message", "Password changed successfuly");
-            return jsonObject.toString();
-        }
-    }
+//    @PostMapping("/change")
+//    public String changePassword(@RequestBody User user) throws Exception {
+//        User chnage = userRepository.findById(user.getId()).get();
+//        if (chnage==null){
+//            JSONObject jsonObject = new JSONObject();
+//            jsonObject.put("message", "User not found");
+//            return jsonObject.toString();
+//        }else{
+//            JSONObject jsonObject = new JSONObject();
+//            jsonObject.put("message", "Password changed successfuly");
+//            return jsonObject.toString();
+//        }
+//    }
 }

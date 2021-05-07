@@ -1,7 +1,7 @@
 package com.example.transactionapi.services.utils;
 
-import com.example.transactionapi.models.enums.Currency;
-import com.example.transactionapi.models.utils.Rate;
+import com.example.transactionapi.model.utils.Currency;
+import com.example.transactionapi.model.utils.Rate;
 import com.example.transactionapi.repository.utils.RateRepository;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -64,6 +64,22 @@ public class CurrencyConverter {
         }
         return rate;
     }
+    public float findRate(Currency currency, LocalDateTime time) {
+        Rate rate = rateRepository.findTopByOrderByIdDesc();
+        if (time != null) {
+            rate = rateRepository.findByUpdatedtime(time);
+            if (rate == null) {
+                rate = rateRepository.findTopByOrderByIdDesc();
+            }
+        }
+        if (currency == Currency.AMD){
+            return rate.getAmd();
+        }else if (currency == Currency.EUR){
+            return rate.getEur();
+        }
+
+        return 1;
+    }
     public double convertByValue(Currency from, Currency to, Double balance, LocalDateTime time){
         Rate rate = rateRepository.findTopByOrderByIdDesc();
         if (time!=null){
@@ -78,7 +94,7 @@ public class CurrencyConverter {
             receiverBalance = balance;
         }else{
             if (from != Currency.USD){
-                if (from== com.example.transactionapi.models.enums.Currency.AMD){
+                if (from== Currency.AMD){
                     senderBalance = balance/rate.getAmd();
                 }else {
                     senderBalance = balance/rate.getEur();
@@ -86,8 +102,8 @@ public class CurrencyConverter {
             }else {
                 senderBalance = balance;
             }
-            if (to != com.example.transactionapi.models.enums.Currency.USD){
-                if (to== com.example.transactionapi.models.enums.Currency.AMD){
+            if (to != Currency.USD){
+                if (to== Currency.AMD){
                     receiverBalance = senderBalance*rate.getAmd();
                 }else {
                     receiverBalance = senderBalance*rate.getEur();

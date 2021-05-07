@@ -1,7 +1,7 @@
 package com.example.transactionapi.repository.utils;
 
 
-import com.example.transactionapi.models.utils.Rate;
+import com.example.transactionapi.model.utils.Rate;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
